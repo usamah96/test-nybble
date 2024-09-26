@@ -1,0 +1,165 @@
+<div
+    class="bg-card h-full w-full items-center justify-center bg-gray-800 px-4 py-8 text-white"
+>
+    <svg
+        class="pointer-events-none absolute inset-0"
+        viewBox="0 0 960 540"
+        width="100%"
+        height="100%"
+        preserveAspectRatio="xMidYMax slice"
+        xmlns="http://www.w3.org/2000/svg"
+    >
+        <g
+            class="text-gray-700 opacity-25"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="100"
+        >
+            <circle r="234" cx="196" cy="23"></circle>
+            <circle r="234" cx="790" cy="491"></circle>
+        </g>
+    </svg>
+    <svg
+        class="absolute -right-0 -top-16 text-gray-700 sm:hidden md:block"
+        viewBox="0 0 220 192"
+        width="220"
+        height="192"
+        fill="none"
+    >
+        <defs>
+            <pattern
+                id="837c3e70-6c3a-44e6-8854-cc48c737b659"
+                x="0"
+                y="0"
+                width="20"
+                height="20"
+                patternUnits="userSpaceOnUse"
+            >
+                <rect
+                    x="0"
+                    y="0"
+                    width="4"
+                    height="4"
+                    fill="currentColor"
+                ></rect>
+            </pattern>
+        </defs>
+        <rect
+            width="220"
+            height="192"
+            fill="url(#837c3e70-6c3a-44e6-8854-cc48c737b659)"
+        ></rect>
+    </svg>
+    <div class="mx-auto max-w-md">
+        <!-- Logo -->
+        <div>
+            <img src="images/logo/logo.png" />
+        </div>
+
+        <!-- Title -->
+        <div class="mt-8 text-4xl font-extrabold leading-tight tracking-tight">
+            Sign in
+        </div>
+
+        <!-- Alert -->
+        @if (showAlert) {
+            <fuse-alert
+                class="mt-8"
+                [appearance]="'outline'"
+                [showIcon]="false"
+                [type]="alert.type"
+                [@shake]="alert.type === 'error'"
+            >
+                {{ alert.message }}
+            </fuse-alert>
+        }
+
+        <!-- Sign in form -->
+        <form class="mt-8" [formGroup]="signInForm" #signInNgForm="ngForm">
+            <!-- Email field -->
+            <mat-form-field class="w-full">
+                <mat-label class="text-white">Email address</mat-label>
+                <input id="email" matInput [formControlName]="'email'" />
+                @if (signInForm.get('email').hasError('required')) {
+                    <mat-error> Email address is required </mat-error>
+                }
+                @if (signInForm.get('email').hasError('email')) {
+                    <mat-error> Please enter a valid email address </mat-error>
+                }
+            </mat-form-field>
+
+            <!-- Password field -->
+            <mat-form-field class="mt-2 w-full">
+                <mat-label class="text-white">Password</mat-label>
+                <input
+                    id="password"
+                    matInput
+                    type="password"
+                    [formControlName]="'password'"
+                    #passwordField
+                />
+                <button
+                    mat-icon-button
+                    type="button"
+                    (click)="
+                        passwordField.type === 'password'
+                            ? (passwordField.type = 'text')
+                            : (passwordField.type = 'password')
+                    "
+                    matSuffix
+                >
+                    @if (passwordField.type === 'password') {
+                        <mat-icon
+                            class="icon-size-5"
+                            [svgIcon]="'heroicons_solid:eye'"
+                        ></mat-icon>
+                    }
+                    @if (passwordField.type === 'text') {
+                        <mat-icon
+                            class="icon-size-5"
+                            [svgIcon]="'heroicons_solid:eye-slash'"
+                        ></mat-icon>
+                    }
+                </button>
+                <mat-error> Password is required </mat-error>
+            </mat-form-field>
+
+            <!-- Actions -->
+            <div class="inline-flex w-full items-center justify-between">
+                <mat-checkbox
+                    class="-ml-2"
+                    color="#ffff"
+                    [formControlName]="'rememberMe'"
+                >
+                    <mat-label class="-ml-1 text-white"
+                        >Keep Signed In</mat-label
+                    >
+                </mat-checkbox>
+                <a
+                    class="text-md font-medium text-primary-500 hover:underline"
+                    [routerLink]="['/forgot-password']"
+                    >Forgot password?
+                </a>
+            </div>
+
+            <!-- Submit button -->
+            <button
+                class="fuse-mat-button-large mt-6 w-full"
+                mat-flat-button
+                [color]="'primary'"
+                [disabled]="signInForm.disabled"
+                (click)="signIn()"
+            >
+                @if (!signInForm.disabled) {
+                    <span> Sign in </span>
+                }
+                @if (signInForm.disabled) {
+                    <mat-progress-spinner
+                        [diameter]="24"
+                        [mode]="'indeterminate'"
+                    ></mat-progress-spinner>
+                }
+            </button>
+        </form>
+    </div>
+</div>
