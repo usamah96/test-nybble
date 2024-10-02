@@ -1,4 +1,11 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import {
+    ChangeDetectorRef,
+    Component,
+    OnInit,
+    ViewChild,
+    ViewEncapsulation,
+} from '@angular/core';
 import {
     FormsModule,
     NgForm,
@@ -17,6 +24,9 @@ import { fuseAnimations } from '@fuse/animations';
 import { FuseAlertComponent, FuseAlertType } from '@fuse/components/alert';
 import { FuseValidators } from '@fuse/validators';
 import { AuthService } from 'app/core/auth/auth.service';
+import { UserService } from 'app/core/user/user.service';
+import { User } from 'app/core/user/user.types';
+import { Subject, finalize, takeUntil } from 'rxjs';
 
 @Component({
     selector: 'auth-change-password',
@@ -39,6 +49,8 @@ import { AuthService } from 'app/core/auth/auth.service';
 export class AuthChangePasswordComponent implements OnInit {
     @ViewChild('changePasswordNgForm') changePasswordNgForm: NgForm;
 
+    passwordPattern =
+        /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-])/;
     alert: { type: FuseAlertType; message: string } = {
         type: 'success',
         message: '',
@@ -46,28 +58,35 @@ export class AuthChangePasswordComponent implements OnInit {
     changePasswordForm: UntypedFormGroup;
     showAlert: boolean = false;
     showForm: boolean = true;
+    user: User;
+    private _unsubscribeAll: Subject<any> = new Subject<any>();
 
-    /**
-     * Constructor
-     */
     constructor(
         private _authService: AuthService,
-        private _formBuilder: UntypedFormBuilder
+        private _userService: UserService,
+        private _formBuilder: UntypedFormBuilder,
+        private _changeDetectorRef: ChangeDetectorRef
     ) {}
 
-    // -----------------------------------------------------------------------------------------------------
-    // @ Lifecycle hooks
-    // -----------------------------------------------------------------------------------------------------
-
-    /**
-     * On init
-     */
     ngOnInit(): void {
-        // Create the form
+        this._userService.user$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((user: User) => {
+                this.user = user;
+                this._changeDetectorRef.markForCheck();
+            });
+
         this.changePasswordForm = this._formBuilder.group(
             {
                 oldPassword: ['', Validators.required],
-                password: ['', Validators.required],
+                password: [
+                    '',
+                    [
+                        Validators.required,
+                        Validators.minLength(7),
+                        Validators.pattern(this.passwordPattern),
+                    ],
+                ],
                 passwordConfirm: ['', Validators.required],
             },
             {
@@ -79,31 +98,42 @@ export class AuthChangePasswordComponent implements OnInit {
         );
     }
 
-    // -----------------------------------------------------------------------------------------------------
-    // @ Public methods
-    // -----------------------------------------------------------------------------------------------------
-
-    /**
-     * Reset password
-     */
     changePassword(): void {
-        // Return if the form is invalid
         if (this.changePasswordForm.invalid) {
             return;
         }
 
-        // Disable the form
         this.changePasswordForm.disable();
-
-        // Hide the alert
         this.showAlert = false;
 
-        this.alert = {
-            type: 'success',
-            message: 'Your password has been reset.',
-        };
-
-        this.showAlert = true;
-        this.showForm = false;
+        this._authService
+            .changePassword({
+                email: this.user.email,
+                oldPassword: this.changePasswordForm.value.oldPassword,
+                newPassword: this.changePasswordForm.value.password,
+            })
+            .pipe(
+                takeUntil(this._unsubscribeAll),
+                finalize(() => {
+                    this.showAlert = true;
+                })
+            )
+            .subscribe(
+                () => {
+                    this.alert = {
+                        type: 'success',
+                        message: 'Your password has been changed',
+                    };
+                    this.showForm = false;
+                },
+                (err: HttpErrorResponse) => {
+                    this.alert = {
+                        type: 'error',
+                        message:
+                            err?.error?.message || 'Unexpected Error Occurred',
+                    };
+                    this.changePasswordForm.enable();
+                }
+            );
     }
 }

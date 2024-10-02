@@ -99,6 +99,7 @@ const config = {
             },
             colors: {
                 gray: colors.slate,
+                'nybble-theme': '#377dff',
             },
             flex: {
                 0: '0 0 auto',

@@ -101,14 +101,18 @@ export class UserComponent implements OnInit, OnDestroy {
         this._userService
             .update({
                 ...this.user,
-                status,
             })
             .subscribe();
     }
 
     signOut(): void {
-        this._authService.signOut();
-        this._router.navigate(['/sign-in']);
+        this._authService
+            .signOut()
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe(
+                () => this._router.navigate(['/sign-in']),
+                (err) => console.log(err)
+            );
     }
 
     changePassword(): void {

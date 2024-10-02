@@ -55,9 +55,43 @@
             </button>
         }
 
-        <div class="ml-auto flex items-center space-x-0.5 pl-2 sm:space-x-2">
-            <notifications></notifications>
-            <user></user>
+        <div class="ml-auto grid grid-cols-2">
+            <div class="ml-auto grid grid-cols-2 gap-7 max-sm:hidden">
+                <div>
+                    <div class="flex items-center">
+                        <mat-icon
+                            class="icon-size-5"
+                            [svgIcon]="
+                                'heroicons_outline:phone-arrow-down-left'
+                            "
+                        ></mat-icon>
+                        <div class="text-secondary ml-1.5 truncate leading-6">
+                            Call Us
+                        </div>
+                    </div>
+                    <ul class="font-medium text-gray-500 dark:text-gray-400">
+                        <li>0330 0020886</li>
+                    </ul>
+                </div>
+                <div>
+                    <div class="flex items-center">
+                        <mat-icon
+                            class="icon-size-5"
+                            [svgIcon]="'heroicons_outline:envelope'"
+                        ></mat-icon>
+                        <div class="text-secondary ml-1.5 truncate leading-6">
+                            Email Us
+                        </div>
+                    </div>
+                    <ul class="font-medium text-gray-500 dark:text-gray-400">
+                        <li>info&#64;nybble.co.uk</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="ml-auto grid grid-cols-2">
+                <div><notifications></notifications></div>
+                <div><user></user></div>
+            </div>
         </div>
     </div>
 
@@ -70,83 +104,18 @@
         }
     </div>
 
-    <footer class="bg-white dark:bg-gray-900">
-        <div class="mx-auto w-full max-w-screen-xl p-4 py-6 lg:py-8">
-            <div class="md:flex md:justify-between">
-                <div class="mb-2">
-                    <img src="images/logo/nybble-logo.png" class="me-3 h-8" />
-                </div>
-                <div class="grid grid-cols-2 gap-8 sm:grid-cols-3 sm:gap-6">
-                    <div>
-                        <div class="flex items-center">
-                            <mat-icon
-                                class="icon-size-5"
-                                [svgIcon]="
-                                    'heroicons_outline:phone-arrow-down-left'
-                                "
-                            ></mat-icon>
-                            <div
-                                class="text-secondary ml-1.5 truncate leading-6"
-                            >
-                                Call Us
-                            </div>
-                        </div>
-                        <ul
-                            class="font-medium text-gray-500 dark:text-gray-400"
-                        >
-                            <li>01274 526200</li>
-                        </ul>
-                    </div>
-                    <div>
-                        <div class="flex items-center">
-                            <mat-icon
-                                class="icon-size-5"
-                                [svgIcon]="'heroicons_outline:clock'"
-                            ></mat-icon>
-                            <div
-                                class="text-secondary ml-1.5 truncate leading-6"
-                            >
-                                Opening Time
-                            </div>
-                        </div>
-                        <ul
-                            class="font-medium text-gray-500 dark:text-gray-400"
-                        >
-                            <li>Mon-Fri: 9.00 AM - 5.30 PM</li>
-                        </ul>
-                    </div>
-                    <div>
-                        <div class="flex items-center">
-                            <mat-icon
-                                class="icon-size-5"
-                                [svgIcon]="'heroicons_outline:envelope'"
-                            ></mat-icon>
-                            <div
-                                class="text-secondary ml-1.5 truncate leading-6"
-                            >
-                                Email Us
-                            </div>
-                        </div>
-                        <ul
-                            class="font-medium text-gray-500 dark:text-gray-400"
-                        >
-                            <li>credit.control&#64;northside.co.uk</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <hr
-                class="my-6 border-gray-200 dark:border-gray-700 sm:mx-auto lg:my-8"
-            />
-            <div class="sm:flex sm:items-center sm:justify-between">
+    <footer
+        class="flex flex-col bg-white shadow-[0_0_9px_5px_rgba(153,153,153,0.5)] dark:bg-gray-900"
+    >
+        <div class="mx-auto max-w-screen-xl p-2 py-2 lg:py-2">
+            <div class="flex items-center justify-between text-center">
                 <span
-                    class="text-sm text-gray-500 dark:text-gray-400 sm:text-center"
+                    class="w-full text-center text-sm text-gray-500 dark:text-gray-400"
                     >© 2024 All Rights Reserved. Invoice Portal developed by
                     <a href="https://nybble.co.uk" class="hover:underline"
-                        >Nybble Synergie</a
-                    >.
+                        >Nybble</a
+                    >
                 </span>
-                <div class="mt-4 flex sm:mt-0 sm:justify-center"></div>
             </div>
         </div>
     </footer>
