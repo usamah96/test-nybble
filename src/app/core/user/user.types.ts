@@ -1,7 +1,11 @@
 export interface User {
-    id: string;
-    name: string;
+    id: number;
     email: string;
-    avatar?: string;
-    status?: string;
+    name: string;
+    roles: [Role];
+}
+
+export interface Role {
+    id: number;
+    roleName: string;
 }

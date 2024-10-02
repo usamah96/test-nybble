@@ -8,31 +8,19 @@ export class UserService {
     private _httpClient = inject(HttpClient);
     private _user: ReplaySubject<User> = new ReplaySubject<User>(1);
 
-    // -----------------------------------------------------------------------------------------------------
-    // @ Accessors
-    // -----------------------------------------------------------------------------------------------------
-
-    /**
-     * Setter & getter for user
-     *
-     * @param value
-     */
-    set user(value: User) {
-        // Store the value
-        this._user.next(value);
+    set user(value: any) {
+        this._user.next({
+            id: value.userResponse.userId,
+            name: value.userResponse.fullName,
+            email: value.userResponse.email,
+            roles: value.roles,
+        });
     }
 
     get user$(): Observable<User> {
         return this._user.asObservable();
     }
 
-    // -----------------------------------------------------------------------------------------------------
-    // @ Public methods
-    // -----------------------------------------------------------------------------------------------------
-
-    /**
-     * Get the current signed-in user data
-     */
     get(): Observable<User> {
         return this._httpClient.get<User>('api/common/user').pipe(
             tap((user) => {
@@ -41,11 +29,6 @@ export class UserService {
         );
     }
 
-    /**
-     * Update the user
-     *
-     * @param user
-     */
     update(user: User): Observable<any> {
         return this._httpClient.patch<User>('api/common/user', { user }).pipe(
             map((response) => {

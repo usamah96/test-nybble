@@ -36,19 +36,19 @@ fuse-horizontal-navigation {
             .fuse-horizontal-navigation-item-active,
             .fuse-horizontal-navigation-item-active-forced {
                 .fuse-horizontal-navigation-item-title {
-                    @apply text-primary #{'!important'};
+                    @apply text-nybble-theme #{'!important'};
                 }
 
                 .fuse-horizontal-navigation-item-subtitle {
-                    @apply text-primary-400 #{'!important'};
+                    @apply text-nybble-theme #{'!important'};
 
                     .dark & {
-                        @apply text-primary-600 #{'!important'};
+                        @apply text-nybble-theme #{'!important'};
                     }
                 }
 
                 .fuse-horizontal-navigation-item-icon {
-                    @apply text-primary #{'!important'};
+                    @apply text-nybble-theme #{'!important'};
                 }
             }
         }
@@ -105,19 +105,19 @@ fuse-horizontal-navigation {
         .fuse-horizontal-navigation-item-active,
         .fuse-horizontal-navigation-item-active-forced {
             .fuse-horizontal-navigation-item-title {
-                @apply text-primary #{'!important'};
+                @apply text-nybble-theme #{'!important'};
             }
 
             .fuse-horizontal-navigation-item-subtitle {
-                @apply text-primary-400 #{'!important'};
+                @apply text-nybble-theme #{'!important'};
 
                 .dark & {
-                    @apply text-primary-600 #{'!important'};
+                    @apply text-nybble-theme #{'!important'};
                 }
             }
 
             .fuse-horizontal-navigation-item-icon {
-                @apply text-primary #{'!important'};
+                @apply text-nybble-theme #{'!important'};
             }
         }
     }

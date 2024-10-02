@@ -55,12 +55,6 @@ export const defaultNavigation: FuseNavigationItem[] = [
             },
         ],
     },
-    {
-        id: 'mot',
-        title: 'MOT History And Road Tax',
-        type: 'basic',
-        icon: 'heroicons_outline:chart-pie',
-    },
 ];
 export const compactNavigation: FuseNavigationItem[] = [
     {
@@ -87,13 +81,6 @@ export const compactNavigation: FuseNavigationItem[] = [
         icon: 'heroicons_outline:envelope',
         children: [],
     },
-    {
-        id: 'mot',
-        title: 'MOT History And Road Tax',
-        tooltip: 'MOT History And Road Tax',
-        type: 'basic',
-        icon: 'heroicons_outline:chart-pie',
-    },
 ];
 export const futuristicNavigation: FuseNavigationItem[] = [
     {
@@ -114,12 +101,6 @@ export const futuristicNavigation: FuseNavigationItem[] = [
         title: 'Messages',
         type: 'group',
         children: [],
-    },
-    {
-        id: 'mot',
-        title: 'MOT History And Road Tax',
-        tooltip: 'MOT History And Road Tax',
-        type: 'basic',
     },
 ];
 export const horizontalNavigation: FuseNavigationItem[] = [
@@ -146,12 +127,5 @@ export const horizontalNavigation: FuseNavigationItem[] = [
         type: 'group',
         icon: 'heroicons_outline:envelope',
         children: [],
-    },
-    {
-        id: 'mot',
-        title: 'MOT History And Road Tax',
-        tooltip: 'MOT History And Road Tax',
-        type: 'basic',
-        icon: 'heroicons_outline:chart-pie',
     },
 ];

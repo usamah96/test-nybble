@@ -1,6 +1,7 @@
 import { CurrencyPipe, NgClass } from '@angular/common';
 import {
     ChangeDetectionStrategy,
+    ChangeDetectorRef,
     Component,
     OnDestroy,
     OnInit,
@@ -15,6 +16,8 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { Router } from '@angular/router';
 import { TranslocoModule } from '@ngneat/transloco';
+import { UserService } from 'app/core/user/user.service';
+import { User } from 'app/core/user/user.types';
 import { ProjectService } from 'app/modules/admin/dashboards/project/project.service';
 import { ApexOptions, NgApexchartsModule } from 'ng-apexcharts';
 import { Subject, takeUntil } from 'rxjs';
@@ -47,6 +50,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
     chartMonthlyExpenses: ApexOptions = {};
     chartYearlyExpenses: ApexOptions = {};
     data: any;
+    user: User;
     selectedProject: string = 'Trevor Iles - Service Only Contract (S6420)';
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -55,7 +59,9 @@ export class ProjectComponent implements OnInit, OnDestroy {
      */
     constructor(
         private _projectService: ProjectService,
-        private _router: Router
+        private _router: Router,
+        private _userService: UserService,
+        private _changeDetectorRef: ChangeDetectorRef
     ) {}
 
     // -----------------------------------------------------------------------------------------------------
@@ -75,6 +81,15 @@ export class ProjectComponent implements OnInit, OnDestroy {
 
                 // Prepare the chart data
                 this._prepareChartData();
+            });
+
+        this._userService.user$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((user: User) => {
+                this.user = user;
+
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
             });
 
         // Attach SVG fill fixer to all ApexCharts

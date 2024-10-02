@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { AuthUtils } from 'app/core/auth/auth.utils';
 import { UserService } from 'app/core/user/user.service';
-import { catchError, Observable, of, switchMap, throwError } from 'rxjs';
+import { catchError, Observable, of, switchMap } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -10,13 +10,6 @@ export class AuthService {
     private _httpClient = inject(HttpClient);
     private _userService = inject(UserService);
 
-    // -----------------------------------------------------------------------------------------------------
-    // @ Accessors
-    // -----------------------------------------------------------------------------------------------------
-
-    /**
-     * Setter & getter for access token
-     */
     set accessToken(token: string) {
         localStorage.setItem('accessToken', token);
     }
@@ -25,54 +18,63 @@ export class AuthService {
         return localStorage.getItem('accessToken') ?? '';
     }
 
-    // -----------------------------------------------------------------------------------------------------
-    // @ Public methods
-    // -----------------------------------------------------------------------------------------------------
-
-    /**
-     * Forgot password
-     *
-     * @param email
-     */
-    forgotPassword(email: string): Observable<any> {
-        return this._httpClient.post('api/auth/forgot-password', email);
+    set userInfo(userInfo: string) {
+        localStorage.setItem('userInfo', userInfo);
     }
 
-    /**
-     * Reset password
-     *
-     * @param password
-     */
-    resetPassword(password: string): Observable<any> {
-        return this._httpClient.post('api/auth/reset-password', password);
+    get userInfo(): string {
+        return localStorage.getItem('userInfo') ?? '';
     }
 
-    /**
-     * Sign in
-     *
-     * @param credentials
-     */
-    signIn(credentials: { email: string; password: string }): Observable<any> {
-        // Throw error, if the user is already logged in
-        if (this._authenticated) {
-            return throwError('User is already logged in.');
-        }
-
-        return this._httpClient.post('api/auth/sign-in', credentials).pipe(
-            switchMap((response: any) => {
-                // Store the access token in the local storage
-                this.accessToken = response.accessToken;
-
-                // Set the authenticated flag to true
-                this._authenticated = true;
-
-                // Store the user on the user service
-                this._userService.user = response.user;
-
-                // Return a new observable with the response
-                return of(response);
-            })
+    forgotPassword(data: { username: string }): Observable<any> {
+        return this._httpClient.post(
+            'http://invoiceportal.nybble.co.uk:9500/public/auth/request-new-password',
+            data
         );
+    }
+
+    resetPassword(data: { password: string; code: string }): Observable<any> {
+        return this._httpClient.patch(
+            'http://invoiceportal.nybble.co.uk:9500/public/auth/reset-password',
+            data
+        );
+    }
+
+    changePassword(data: {
+        email: string;
+        oldPassword: string;
+        newPassword: string;
+    }): Observable<any> {
+        return this._httpClient.put(
+            'http://invoiceportal.nybble.co.uk:9500/auth/change-password',
+            data
+        );
+    }
+
+    signIn(credentials: { email: string; password: string }): Observable<any> {
+        const base64EncodedCredentials =
+            'Basic ' + btoa(credentials.email + ':' + credentials.password);
+
+        const headers = {
+            Authorization: base64EncodedCredentials,
+        };
+
+        return this._httpClient
+            .post('http://invoiceportal.nybble.co.uk:9500/auth/login', null, {
+                headers,
+                observe: 'response',
+            })
+            .pipe(
+                switchMap((response: any) => {
+                    this.accessToken = response.headers.get('Authorization');
+                    this.userInfo = JSON.stringify(response.body);
+
+                    this._authenticated = true;
+                    this._userService.user = response.body;
+
+                    return of(response);
+                })
+            );
     }
 
     /**
@@ -113,18 +115,22 @@ export class AuthService {
             );
     }
 
-    /**
-     * Sign out
-     */
     signOut(): Observable<any> {
-        // Remove the access token from the local storage
+        return this._httpClient
+            .post('http://invoiceportal.nybble.co.uk:9500/auth/logout', null)
+            .pipe(
+                switchMap(() => {
+                    this.clearSession();
+                    return of(true);
+                })
+            );
+    }
+
+    clearSession() {
         localStorage.removeItem('accessToken');
+        localStorage.removeItem('userInfo');
 
-        // Set the authenticated flag to false
         this._authenticated = false;
-
-        // Return the observable
-        return of(true);
     }
 
     /**
@@ -163,7 +169,7 @@ export class AuthService {
         }
 
         // Check the access token availability
-        if (!this.accessToken) {
+        if (!this.accessToken || !this.userInfo) {
             return of(false);
         }
 
@@ -173,6 +179,10 @@ export class AuthService {
         }
 
         // If the access token exists, and it didn't expire, sign in using it
-        return this.signInUsingToken();
+        // return this.signInUsingToken();
+        this._authenticated = true;
+        this._userService.user = JSON.parse(this.userInfo);
+
+        return of(true);
     }
 }

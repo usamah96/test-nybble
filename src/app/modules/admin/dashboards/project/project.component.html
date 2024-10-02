@@ -1,7 +1,7 @@
 <div class="flex min-w-0 flex-auto flex-col">
     <!-- Header -->
     <div class="bg-card">
-        <div class="mx-auto flex w-full max-w-screen-xl flex-col px-6 sm:px-8">
+        <div class="flex w-full max-w-screen-xl flex-col px-6 sm:px-8">
             <div
                 class="my-8 flex min-w-0 flex-auto flex-col sm:my-12 sm:flex-row sm:items-center"
             >
@@ -12,7 +12,7 @@
                             <div
                                 class="truncate text-2xl font-semibold leading-7 tracking-tight md:text-5xl md:leading-snug"
                             >
-                                {{ t('welcome-back') }}, Admin!
+                                {{ t('welcome-back') }}, {{ user.name }}!
                             </div>
                         </ng-container>
                         <div class="flex items-center">
@@ -59,7 +59,7 @@
     </div>
 
     <div class="-mt-px flex-auto border-t pt-4 sm:pt-6">
-        <div class="mx-auto w-full max-w-screen-xl">
+        <div class="w-full md:p-0 lg:p-6">
             <div
                 class="grid w-full min-w-0 grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3"
             >
