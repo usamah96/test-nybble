@@ -16,7 +16,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { Router } from '@angular/router';
 import { AuthService } from 'app/core/auth/auth.service';
 import { UserService } from 'app/core/user/user.service';
-import { User } from 'app/core/user/user.types';
+import { LoginUser } from 'app/shared/types/shared.types';
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({
@@ -40,7 +40,7 @@ export class UserComponent implements OnInit, OnDestroy {
     /* eslint-enable @typescript-eslint/naming-convention */
 
     @Input() showAvatar: boolean = true;
-    user: User;
+    user: LoginUser;
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -65,7 +65,7 @@ export class UserComponent implements OnInit, OnDestroy {
         // Subscribe to user changes
         this._userService.user$
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((user: User) => {
+            .subscribe((user: LoginUser) => {
                 this.user = user;
 
                 // Mark for check

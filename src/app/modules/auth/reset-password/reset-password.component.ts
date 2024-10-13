@@ -17,7 +17,7 @@ import { fuseAnimations } from '@fuse/animations';
 import { FuseAlertComponent, FuseAlertType } from '@fuse/components/alert';
 import { FuseValidators } from '@fuse/validators';
 import { AuthService } from 'app/core/auth/auth.service';
-import { User } from 'app/core/user/user.types';
+import { LoginUser } from 'app/shared/types/shared.types';
 import { Subject, finalize } from 'rxjs';
 
 @Component({
@@ -51,7 +51,7 @@ export class AuthResetPasswordComponent implements OnInit {
     showAlert: boolean = false;
     showForm: boolean = true;
     code: string;
-    user: User;
+    user: LoginUser;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     constructor(

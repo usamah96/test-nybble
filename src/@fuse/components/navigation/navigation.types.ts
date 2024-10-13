@@ -7,6 +7,7 @@ import {
 export interface FuseNavigationItem {
     id?: string;
     title?: string;
+    role?: string[];
     subtitle?: string;
     type: 'aside' | 'basic' | 'collapsable' | 'divider' | 'group' | 'spacer';
     hidden?: (item: FuseNavigationItem) => boolean;

@@ -3,7 +3,7 @@
         <!-- Skip the hidden items -->
         @if ((item.hidden && !item.hidden(item)) || !item.hidden) {
             <!-- Basic -->
-            @if (item.type === 'basic') {
+            @if (item.type === 'basic' && isRoleValid(item.role)) {
                 <fuse-horizontal-navigation-basic-item
                     class="fuse-horizontal-navigation-menu-item"
                     [item]="item"
@@ -13,9 +13,10 @@
 
             <!-- Branch: aside, collapsable, group -->
             @if (
-                item.type === 'aside' ||
-                item.type === 'collapsable' ||
-                item.type === 'group'
+                (item.type === 'aside' ||
+                    item.type === 'collapsable' ||
+                    item.type === 'group') &&
+                isRoleValid(item.role)
             ) {
                 <fuse-horizontal-navigation-branch-item
                     class="fuse-horizontal-navigation-menu-item"
@@ -25,7 +26,7 @@
             }
 
             <!-- Spacer -->
-            @if (item.type === 'spacer') {
+            @if (item.type === 'spacer' && isRoleValid(item.role)) {
                 <fuse-horizontal-navigation-spacer-item
                     class="fuse-horizontal-navigation-menu-item"
                     [item]="item"

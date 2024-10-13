@@ -28,14 +28,14 @@ export class AuthService {
 
     forgotPassword(data: { username: string }): Observable<any> {
         return this._httpClient.post(
-            'http://invoiceportal.nybble.co.uk:9500/public/auth/request-new-password',
+            'http://localhost:9500/public/auth/request-new-password',
             data
         );
     }
 
     resetPassword(data: { password: string; code: string }): Observable<any> {
         return this._httpClient.patch(
-            'http://invoiceportal.nybble.co.uk:9500/public/auth/reset-password',
+            'http://localhost:9500/public/auth/reset-password',
             data
         );
     }
@@ -46,7 +46,7 @@ export class AuthService {
         newPassword: string;
     }): Observable<any> {
         return this._httpClient.put(
-            'http://invoiceportal.nybble.co.uk:9500/auth/change-password',
+            'http://localhost:9500/auth/change-password',
             data
         );
     }
@@ -60,7 +60,7 @@ export class AuthService {
         };
 
         return this._httpClient
-            .post('http://invoiceportal.nybble.co.uk:9500/auth/login', null, {
+            .post('http://localhost:9500/auth/login', null, {
                 headers,
                 observe: 'response',
             })
@@ -117,7 +117,7 @@ export class AuthService {
 
     signOut(): Observable<any> {
         return this._httpClient
-            .post('http://invoiceportal.nybble.co.uk:9500/auth/logout', null)
+            .post('http://localhost:9500/auth/logout', null)
             .pipe(
                 switchMap(() => {
                     this.clearSession();

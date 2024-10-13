@@ -1,0 +1,250 @@
+<div class="flex min-w-0 flex-auto flex-col">
+    <div class="bg-card">
+        <div class="mt-5 flex w-full max-w-screen-xl flex-col px-6 sm:px-8">
+            <div
+                class="bg-default relative flex cursor-pointer self-start overflow-hidden rounded-t-xl border border-b-0 pb-1 pl-5 pr-4 pt-2"
+                matRipple
+            >
+                <div class="flex items-center">
+                    <div class="overflow-hidden">
+                        <div class="truncate font-medium leading-6">
+                            {{ selectedProject }}
+                        </div>
+                    </div>
+                </div>
+                <mat-menu [xPosition]="'before'">
+                    <button mat-menu-item>
+                        Trevor Iles - Service Only Contract (S6420)
+                    </button>
+                </mat-menu>
+            </div>
+        </div>
+    </div>
+
+    <div class="-mt-px flex-auto border-t pt-4 sm:pt-6">
+        <div class="w-full md:p-0 lg:p-6">
+            @if (isRoleValid(['INTERNAL_USER'])) {
+                <div
+                    class="grid w-full min-w-0 grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3"
+                >
+                    <div
+                        class="bg-card flex flex-auto flex-col overflow-hidden rounded-2xl p-6 shadow"
+                    >
+                        <div class="flex items-start justify-between">
+                            <div
+                                class="truncate text-lg font-medium leading-6 tracking-tight"
+                            >
+                                Invoices
+                            </div>
+                        </div>
+                        <div class="mt-2 flex flex-col items-center">
+                            <div
+                                class="text-7xl font-bold leading-none tracking-tight text-blue-500 sm:text-8xl"
+                            >
+                                21
+                            </div>
+                            <div
+                                class="text-lg font-medium text-blue-600 dark:text-blue-500"
+                            >
+                                Total
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-card flex flex-auto flex-col overflow-hidden rounded-2xl p-6 shadow"
+                    >
+                        <div class="flex items-start justify-between">
+                            <div
+                                class="truncate text-lg font-medium leading-6 tracking-tight"
+                            >
+                                Invoices
+                            </div>
+                        </div>
+                        <div class="mt-2 flex flex-col items-center">
+                            <div
+                                class="text-7xl font-bold leading-none tracking-tight text-red-500 sm:text-8xl"
+                            >
+                                17
+                            </div>
+                            <div
+                                class="text-lg font-medium text-red-600 dark:text-red-500"
+                            >
+                                Outstanding
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-card flex flex-auto flex-col overflow-hidden rounded-2xl p-6 shadow"
+                    >
+                        <div class="flex items-start justify-between">
+                            <div
+                                class="truncate text-lg font-medium leading-6 tracking-tight"
+                            >
+                                Invoices
+                            </div>
+                        </div>
+                        <div class="mt-2 flex flex-col items-center">
+                            <div
+                                class="text-7xl font-bold leading-none tracking-tight text-amber-500 sm:text-8xl"
+                            >
+                                24
+                            </div>
+                            <div
+                                class="text-lg font-medium text-amber-600 dark:text-amber-500"
+                            >
+                                Queried
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div
+                    class="mt-5 grid w-full min-w-0 grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3"
+                >
+                    <div
+                        class="bg-card flex flex-auto flex-col overflow-hidden rounded-2xl p-6 shadow"
+                    >
+                        <div class="flex items-start justify-between">
+                            <div
+                                class="truncate text-lg font-medium leading-6 tracking-tight"
+                            >
+                                Invoices
+                            </div>
+                        </div>
+                        <div class="mt-2 flex flex-col items-center">
+                            <div
+                                class="text-7xl font-bold leading-none tracking-tight text-green-500 sm:text-8xl"
+                            >
+                                30
+                            </div>
+                            <div
+                                class="text-lg font-medium text-green-600 dark:text-green-500"
+                            >
+                                Paid
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-card flex flex-auto flex-col overflow-hidden rounded-2xl p-6 shadow"
+                    >
+                        <div class="flex items-start justify-between">
+                            <div
+                                class="truncate text-lg font-medium leading-6 tracking-tight"
+                            >
+                                Messages
+                            </div>
+                        </div>
+                        <div class="mt-2 flex flex-col items-center">
+                            <div
+                                class="text-7xl font-bold leading-none tracking-tight text-gray-500 sm:text-8xl"
+                            >
+                                5
+                            </div>
+                            <div
+                                class="text-lg font-medium text-gray-600 dark:text-gray-500"
+                            >
+                                Sent
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-card flex flex-auto flex-col overflow-hidden rounded-2xl p-6 shadow"
+                    >
+                        <div class="flex items-start justify-between">
+                            <div
+                                class="truncate text-lg font-medium leading-6 tracking-tight"
+                            >
+                                Messages
+                            </div>
+                        </div>
+                        <div class="mt-2 flex flex-col items-center">
+                            <div
+                                class="text-7xl font-bold leading-none tracking-tight text-purple-500 sm:text-8xl"
+                            >
+                                7
+                            </div>
+                            <div
+                                class="text-lg font-medium text-purple-600 dark:text-purple-500"
+                            >
+                                Received
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            } @else if (isRoleValid(['ADMIN'])) {
+                <div
+                    class="mt-5 grid w-full min-w-0 grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3"
+                >
+                    <div
+                        class="bg-card flex flex-auto flex-col overflow-hidden rounded-2xl p-6 shadow"
+                    >
+                        <div class="flex items-start justify-between">
+                            <div
+                                class="truncate text-lg font-medium leading-6 tracking-tight"
+                            >
+                                Users
+                            </div>
+                        </div>
+                        <div class="mt-2 flex flex-col items-center">
+                            <div
+                                class="text-7xl font-bold leading-none tracking-tight text-green-500 sm:text-8xl"
+                            >
+                                30
+                            </div>
+                            <div
+                                class="text-lg font-medium text-green-600 dark:text-green-500"
+                            >
+                                Total
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-card flex flex-auto flex-col overflow-hidden rounded-2xl p-6 shadow"
+                    >
+                        <div class="flex items-start justify-between">
+                            <div
+                                class="truncate text-lg font-medium leading-6 tracking-tight"
+                            >
+                                Customers
+                            </div>
+                        </div>
+                        <div class="mt-2 flex flex-col items-center">
+                            <div
+                                class="text-7xl font-bold leading-none tracking-tight text-red-500 sm:text-8xl"
+                            >
+                                50
+                            </div>
+                            <div
+                                class="text-lg font-medium text-red-600 dark:text-red-500"
+                            >
+                                Total
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-card flex flex-auto flex-col overflow-hidden rounded-2xl p-6 shadow"
+                    >
+                        <div class="flex items-start justify-between">
+                            <div
+                                class="truncate text-lg font-medium leading-6 tracking-tight"
+                            >
+                                Branches
+                            </div>
+                        </div>
+                        <div class="mt-2 flex flex-col items-center">
+                            <div
+                                class="text-7xl font-bold leading-none tracking-tight text-purple-500 sm:text-8xl"
+                            >
+                                15
+                            </div>
+                            <div
+                                class="text-lg font-medium text-purple-600 dark:text-purple-500"
+                            >
+                                Total
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

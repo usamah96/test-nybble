@@ -1,0 +1,754 @@
+<div
+    class="bg-card flex min-w-0 flex-auto flex-col dark:bg-transparent sm:absolute sm:inset-0 sm:overflow-hidden"
+>
+    <div
+        class="relative flex flex-0 flex-col border-b p-5 sm:flex-row sm:items-center sm:justify-between"
+    >
+        @if (isLoading) {
+            <div class="absolute inset-x-0 bottom-0">
+                <mat-progress-bar [mode]="'indeterminate'"></mat-progress-bar>
+            </div>
+        }
+        <div class="grid-col-3 grid w-full gap-3 md:flex md:flex-row">
+            <div>
+                <mat-form-field
+                    class="fuse-mat-dense fuse-mat-rounded min-w-64"
+                    [subscriptSizing]="'dynamic'"
+                >
+                    <input
+                        matInput
+                        #emailSearch
+                        (keydown.enter)="
+                            test(
+                                emailSearch.value,
+                                fullnameSearch.value,
+                                phoneSearch.value
+                            )
+                        "
+                        [autocomplete]="'off'"
+                        [placeholder]="'Email'"
+                    />
+                </mat-form-field>
+            </div>
+            <div>
+                <mat-form-field
+                    class="fuse-mat-dense fuse-mat-rounded min-w-64"
+                    [subscriptSizing]="'dynamic'"
+                >
+                    <input
+                        matInput
+                        #fullnameSearch
+                        [autocomplete]="'off'"
+                        [placeholder]="'Full Name'"
+                    />
+                </mat-form-field>
+            </div>
+            <div>
+                <mat-form-field
+                    class="fuse-mat-dense fuse-mat-rounded min-w-64"
+                    [subscriptSizing]="'dynamic'"
+                >
+                    <input
+                        matInput
+                        #phoneSearch
+                        [autocomplete]="'off'"
+                        [placeholder]="'Phone'"
+                    />
+                </mat-form-field>
+            </div>
+        </div>
+        <button
+            class="mt-4 max-w-[20%] bg-nybble-theme text-white md:mt-0 md:justify-end"
+            mat-flat-button
+            (click)="openDialog()"
+        >
+            <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+            <span>Add User</span>
+        </button>
+    </div>
+
+    @if (users$ | async; as users) {
+        @if (users.length > 0) {
+            <div
+                class="relative flex flex-col overflow-scroll rounded-lg bg-white bg-clip-border pb-16 text-gray-700"
+            >
+                <table
+                    class="min-w-max table-auto text-left"
+                    [ngClass]="{ 'blur-sm': isLoading }"
+                >
+                    <thead>
+                        <tr>
+                            <th
+                                class="border-b border-slate-200 bg-slate-100 p-4 text-center"
+                            >
+                                <p
+                                    class="text-md font-bold leading-none text-slate-500"
+                                >
+                                    Email
+                                </p>
+                            </th>
+                            <th
+                                class="border-b border-slate-200 bg-slate-100 p-4 text-center"
+                            >
+                                <p
+                                    class="text-md font-bold leading-none text-slate-500"
+                                >
+                                    Full Name
+                                </p>
+                            </th>
+                            <th
+                                class="border-b border-slate-200 bg-slate-100 p-4 text-center"
+                            >
+                                <p
+                                    class="text-md font-bold leading-none text-slate-500"
+                                >
+                                    Phone
+                                </p>
+                            </th>
+                            <th
+                                class="border-b border-slate-200 bg-slate-100 p-4 text-center"
+                            >
+                                <p
+                                    class="text-md font-bold leading-none text-slate-500"
+                                >
+                                    Locked?
+                                </p>
+                            </th>
+                            <th
+                                class="border-b border-slate-200 bg-slate-100 p-4 text-center"
+                            >
+                                <p
+                                    class="text-md font-bold leading-none text-slate-500"
+                                >
+                                    Email Confirmed?
+                                </p>
+                            </th>
+                            <th
+                                class="border-b border-slate-200 bg-slate-100 p-4 text-center"
+                            >
+                                <p
+                                    class="text-md font-bold leading-none text-slate-500"
+                                >
+                                    Actions
+                                </p>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (users$ | async; as users) {
+                            @for (
+                                user of users;
+                                track trackByFn($index, user)
+                            ) {
+                                <tr
+                                    class="border-b border-slate-200 hover:bg-slate-50"
+                                >
+                                    <td class="p-4 py-5 text-center">
+                                        <p class="text-sm text-slate-500">
+                                            {{ user.email }}
+                                        </p>
+                                    </td>
+                                    <td class="p-4 py-5 text-center">
+                                        <p class="text-sm text-slate-500">
+                                            {{ user.name }}
+                                        </p>
+                                    </td>
+                                    <td class="p-4 py-5 text-center">
+                                        <p class="text-sm text-slate-500">
+                                            {{ user.phone }}
+                                        </p>
+                                    </td>
+                                    <td class="p-4 py-5 text-center">
+                                        <p class="text-sm text-slate-500">
+                                            @if (user.isLocked) {
+                                                {{ 'YES' }}
+                                            } @else {
+                                                {{ 'NO' }}
+                                            }
+                                        </p>
+                                    </td>
+                                    <td class="p-4 py-5 text-center">
+                                        <p class="text-sm text-slate-500">
+                                            @if (user.isEmailConfirmed) {
+                                                {{ 'YES' }}
+                                            } @else {
+                                                {{ 'NO' }}
+                                            }
+                                        </p>
+                                    </td>
+                                    <td class="p-4 py-5 text-center">
+                                        <button
+                                            (click)="unblock()"
+                                            class="h-7 min-h-7 min-w-10 px-2 leading-6"
+                                            [disabled]="!user.isLocked"
+                                        >
+                                            <mat-icon
+                                                class="icon-size-5"
+                                                [matTooltip]="
+                                                    user.isLocked
+                                                        ? 'Unblock'
+                                                        : ''
+                                                "
+                                                [svgIcon]="
+                                                    'heroicons_solid:lock-open'
+                                                "
+                                            ></mat-icon>
+                                        </button>
+                                        <button
+                                            class="h-7 min-h-7 min-w-10 px-2 leading-6"
+                                            (click)="edit(user.id)"
+                                        >
+                                            <mat-icon
+                                                class="icon-size-5"
+                                                matTooltip="Edit"
+                                                [svgIcon]="
+                                                    'heroicons_solid:pencil'
+                                                "
+                                            ></mat-icon>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div>
+                <mat-paginator
+                    class="z-10 border-b bg-gray-50 dark:bg-transparent sm:absolute sm:inset-x-0 sm:bottom-0 sm:border-b-0 sm:border-t"
+                    [ngClass]="{ 'pointer-events-none': isLoading }"
+                    [length]="'23'"
+                    [pageIndex]="'1'"
+                    [pageSize]="'10'"
+                    [pageSizeOptions]="[5, 10, 25, 100]"
+                    [showFirstLastButtons]="true"
+                    (page)="setPageFilter($event)"
+                ></mat-paginator>
+            </div>
+        } @else {
+            <div
+                class="border-t p-8 text-center text-4xl font-semibold tracking-tight sm:p-16"
+            >
+                There are no products!
+            </div>
+        }
+    }
+    @if (isDialogOpen) {
+        <div
+            class="fixed inset-0 z-[999] grid h-screen w-screen place-items-center overflow-y-auto bg-black bg-opacity-60 backdrop-blur-sm transition-opacity duration-300"
+        >
+            <div
+                class="relative m-4 max-w-[80%] rounded-lg bg-white p-4 shadow-sm md:w-2/5 lg:w-2/5"
+            >
+                @if (showAlert) {
+                    <div
+                        class="relative mb-4 mt-2 rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700"
+                        role="alert"
+                    >
+                        <span class="block sm:inline"
+                            >Something seriously bad happened.</span
+                        >
+                        <span
+                            class="absolute bottom-0 right-0 top-0 px-4 py-3"
+                            (click)="closeAlert()"
+                        >
+                            <svg
+                                class="h-6 w-6 fill-current text-red-500"
+                                role="button"
+                                viewBox="0 0 20 20"
+                            >
+                                <title>Close</title>
+                                <path
+                                    d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"
+                                />
+                            </svg>
+                        </span>
+                    </div>
+                }
+                <div
+                    class="flex items-center pb-4 text-xl font-medium text-slate-800"
+                >
+                    Add User
+                </div>
+                <div
+                    class="relative border-t border-slate-200 py-4 font-light leading-normal text-slate-600"
+                >
+                    <form class="flex w-full flex-row" [formGroup]="userForm">
+                        <div class="flex flex-row">
+                            <div class="flex flex-auto flex-wrap">
+                                <div class="flex w-full flex-row gap-3 p-2">
+                                    <mat-form-field class="w-full">
+                                        <mat-label>Full Name</mat-label>
+                                        <mat-icon
+                                            class="icon-size-5"
+                                            matPrefix
+                                            [svgIcon]="'heroicons_solid:user'"
+                                        ></mat-icon>
+                                        <input
+                                            matInput
+                                            [formControlName]="'name'"
+                                        />
+                                        @if (
+                                            userForm
+                                                .get('name')
+                                                .hasError('required')
+                                        ) {
+                                            <mat-error>
+                                                Full Name is required
+                                            </mat-error>
+                                        }
+                                    </mat-form-field>
+                                    <mat-form-field class="w-full">
+                                        <mat-label>Phone Number</mat-label>
+                                        <mat-icon
+                                            class="icon-size-5"
+                                            matPrefix
+                                            [svgIcon]="'heroicons_solid:phone'"
+                                        ></mat-icon>
+                                        <input
+                                            matInput
+                                            [formControlName]="'phone'"
+                                        />
+                                        @if (
+                                            userForm
+                                                .get('phone')
+                                                .hasError('required')
+                                        ) {
+                                            <mat-error>
+                                                Phone is required
+                                            </mat-error>
+                                        }
+                                    </mat-form-field>
+                                </div>
+                                <div class="flex w-full flex-row gap-3 p-2">
+                                    <mat-form-field class="w-full">
+                                        <mat-label>Email</mat-label>
+                                        <mat-icon
+                                            class="icon-size-5"
+                                            matPrefix
+                                            [svgIcon]="
+                                                'heroicons_solid:envelope'
+                                            "
+                                        ></mat-icon>
+                                        <input
+                                            matInput
+                                            [formControlName]="'email'"
+                                        />
+                                        @if (
+                                            userForm
+                                                .get('email')
+                                                .hasError('required')
+                                        ) {
+                                            <mat-error>
+                                                Email address is required
+                                            </mat-error>
+                                        }
+                                        @if (
+                                            userForm
+                                                .get('email')
+                                                .hasError('email')
+                                        ) {
+                                            <mat-error>
+                                                Please enter a valid email
+                                                address
+                                            </mat-error>
+                                        }
+                                    </mat-form-field>
+                                </div>
+                                <div class="flex w-full flex-row gap-3 p-2">
+                                    <mat-form-field class="w-full">
+                                        <mat-label>Password</mat-label>
+                                        <button
+                                            mat-icon-button
+                                            type="button"
+                                            (click)="
+                                                passwordField.type ===
+                                                'password'
+                                                    ? (passwordField.type =
+                                                          'text')
+                                                    : (passwordField.type =
+                                                          'password')
+                                            "
+                                            matPrefix
+                                        >
+                                            @if (
+                                                passwordField.type ===
+                                                'password'
+                                            ) {
+                                                <mat-icon
+                                                    class="icon-size-5"
+                                                    [svgIcon]="
+                                                        'heroicons_solid:eye'
+                                                    "
+                                                ></mat-icon>
+                                            }
+                                            @if (
+                                                passwordField.type === 'text'
+                                            ) {
+                                                <mat-icon
+                                                    class="icon-size-5"
+                                                    [svgIcon]="
+                                                        'heroicons_solid:eye-slash'
+                                                    "
+                                                ></mat-icon>
+                                            }
+                                        </button>
+                                        <input
+                                            #passwordField
+                                            matInput
+                                            type="password"
+                                            [formControlName]="'password'"
+                                        />
+                                        @if (
+                                            userForm
+                                                .get('password')
+                                                .hasError('required')
+                                        ) {
+                                            <mat-error>
+                                                Password is required
+                                            </mat-error>
+                                        } @else if (
+                                            userForm
+                                                .get('password')
+                                                .hasError('minlength')
+                                        ) {
+                                            <mat-error>
+                                                Password must be minimum 7
+                                                characters long
+                                            </mat-error>
+                                        } @else if (
+                                            userForm
+                                                .get('password')
+                                                .hasError('pattern')
+                                        ) {
+                                            <mat-error>
+                                                Password must contain lowercase,
+                                                uppercase, digit and special
+                                                character
+                                            </mat-error>
+                                        }
+                                    </mat-form-field>
+                                    <mat-form-field class="w-full">
+                                        <mat-label>Confirm Password </mat-label>
+                                        <button
+                                            mat-icon-button
+                                            type="button"
+                                            (click)="
+                                                confirmPasswordField.type ===
+                                                'password'
+                                                    ? (confirmPasswordField.type =
+                                                          'text')
+                                                    : (confirmPasswordField.type =
+                                                          'password')
+                                            "
+                                            matPrefix
+                                        >
+                                            @if (
+                                                confirmPasswordField.type ===
+                                                'password'
+                                            ) {
+                                                <mat-icon
+                                                    class="icon-size-5"
+                                                    [svgIcon]="
+                                                        'heroicons_solid:eye'
+                                                    "
+                                                ></mat-icon>
+                                            }
+                                            @if (
+                                                confirmPasswordField.type ===
+                                                'text'
+                                            ) {
+                                                <mat-icon
+                                                    class="icon-size-5"
+                                                    [svgIcon]="
+                                                        'heroicons_solid:eye-slash'
+                                                    "
+                                                ></mat-icon>
+                                            }
+                                        </button>
+                                        <input
+                                            #confirmPasswordField
+                                            matInput
+                                            type="password"
+                                            [formControlName]="
+                                                'confirmPassword'
+                                            "
+                                        />
+                                        @if (
+                                            userForm
+                                                .get('confirmPassword')
+                                                .hasError('required')
+                                        ) {
+                                            <mat-error>
+                                                Password confirmation is
+                                                required
+                                            </mat-error>
+                                        }
+                                        @if (
+                                            userForm
+                                                .get('confirmPassword')
+                                                .hasError('mustMatch')
+                                        ) {
+                                            <mat-error>
+                                                Passwords must match
+                                            </mat-error>
+                                        }
+                                    </mat-form-field>
+                                </div>
+
+                                <div
+                                    class="flex w-full flex-row justify-center gap-5 p-2"
+                                >
+                                    <div class="w-1-4 flex flex-row">
+                                        <input
+                                            id="admin"
+                                            type="radio"
+                                            #adminField
+                                            value="admin"
+                                            formControlName="userType"
+                                        />
+                                        <label class="ml-2" for="admin"
+                                            >Admin</label
+                                        >
+                                    </div>
+
+                                    <div class="flex flex-row">
+                                        <input
+                                            id="internal-user"
+                                            type="radio"
+                                            class="custom-control-input"
+                                            value="internal-user"
+                                            formControlName="userType"
+                                        />
+                                        <label class="ml-2" for="internal-user"
+                                            >Internal User</label
+                                        >
+                                    </div>
+
+                                    <div class="flex flex-row">
+                                        <input
+                                            id="customer"
+                                            type="radio"
+                                            class="custom-control-input"
+                                            value="customer"
+                                            formControlName="userType"
+                                        />
+                                        <label class="ml-2" for="customer"
+                                            >Customer</label
+                                        >
+                                    </div>
+                                </div>
+
+                                @if (showBranchForm) {
+                                    <div class="flex w-full flex-row p-2">
+                                        <input
+                                            id="allBranches"
+                                            type="checkbox"
+                                            formControlName="allBranches"
+                                        />
+                                        <label class="ml-2" for="allBranches"
+                                            >All Branches</label
+                                        >
+                                    </div>
+
+                                    @if (showBranchList) {
+                                        <div
+                                            class="flex w-full flex-row gap-3 p-2"
+                                        >
+                                            <mat-form-field class="w-full">
+                                                <mat-label>Branches</mat-label>
+                                                <mat-icon
+                                                    class="icon-size-5"
+                                                    matPrefix
+                                                    [svgIcon]="
+                                                        'heroicons_solid:user-group'
+                                                    "
+                                                ></mat-icon>
+                                                <mat-select
+                                                    [formControlName]="
+                                                        'branches'
+                                                    "
+                                                    multiple
+                                                >
+                                                    <mat-form-field
+                                                        class="w-full"
+                                                    >
+                                                        <input
+                                                            placeholder="Search Branch"
+                                                            matInput
+                                                        />
+                                                    </mat-form-field>
+                                                    @if (
+                                                        branchSummary$ | async;
+                                                        as branchSummaries
+                                                    ) {
+                                                        @for (
+                                                            branchSummary of branchSummaries;
+                                                            track trackByFn(
+                                                                $index,
+                                                                branchSummary
+                                                            )
+                                                        ) {
+                                                            <mat-option
+                                                                [value]="
+                                                                    branchSummary.id
+                                                                "
+                                                            >
+                                                                {{
+                                                                    branchSummary.code
+                                                                }}
+                                                            </mat-option>
+                                                        }
+                                                    }
+                                                </mat-select>
+                                                @if (
+                                                    userForm
+                                                        .get('branches')
+                                                        .hasError('required')
+                                                ) {
+                                                    <mat-error>
+                                                        Branches are required
+                                                    </mat-error>
+                                                }
+                                            </mat-form-field>
+                                        </div>
+                                    }
+                                }
+
+                                @if (showInvoiceCustomerForm) {
+                                    <div class="flex w-full flex-row gap-3 p-2">
+                                        <mat-form-field class="w-full">
+                                            <mat-label
+                                                >Invoice Customers</mat-label
+                                            >
+                                            <mat-icon
+                                                class="icon-size-5"
+                                                matPrefix
+                                                [svgIcon]="
+                                                    'heroicons_solid:user-group'
+                                                "
+                                            ></mat-icon>
+                                            <mat-select
+                                                [formControlName]="
+                                                    'invoiceCustomers'
+                                                "
+                                                multiple
+                                            >
+                                                <mat-form-field class="w-full">
+                                                    <input
+                                                        placeholder="Search Customer"
+                                                        matInput
+                                                    />
+                                                </mat-form-field>
+                                                @if (
+                                                    customerSummary$ | async;
+                                                    as invoiceCustomers
+                                                ) {
+                                                    @for (
+                                                        customerSummary of invoiceCustomers;
+                                                        track trackByFn(
+                                                            $index,
+                                                            customerSummary
+                                                        )
+                                                    ) {
+                                                        <mat-option
+                                                            [value]="
+                                                                customerSummary.id
+                                                            "
+                                                        >
+                                                            {{
+                                                                customerSummary.name
+                                                            }}
+                                                        </mat-option>
+                                                    }
+                                                }
+                                            </mat-select>
+                                            @if (
+                                                userForm
+                                                    .get('invoiceCustomers')
+                                                    .hasError('required')
+                                            ) {
+                                                <mat-error>
+                                                    Invoice Customers are
+                                                    required
+                                                </mat-error>
+                                            }
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="flex w-full flex-row p-2">
+                                        <input
+                                            id="sendInvoiceByEmail"
+                                            type="checkbox"
+                                            formControlName="sendInvoiceByEmail"
+                                        />
+                                        <label
+                                            class="ml-2"
+                                            for="sendInvoiceByEmail"
+                                            >Send Invoice By Email</label
+                                        >
+                                    </div>
+                                    <div class="flex w-full flex-row p-2">
+                                        <mat-form-field class="w-full">
+                                            <mat-label>Invoice Email</mat-label>
+                                            <mat-icon
+                                                class="icon-size-5"
+                                                matPrefix
+                                                [svgIcon]="
+                                                    'heroicons_solid:envelope'
+                                                "
+                                            ></mat-icon>
+                                            <input
+                                                matInput
+                                                [formControlName]="
+                                                    'invoiceEmail'
+                                                "
+                                            />
+                                            @if (
+                                                userForm
+                                                    .get('invoiceEmail')
+                                                    .hasError('required')
+                                            ) {
+                                                <mat-error>
+                                                    Invoice Email is required
+                                                </mat-error>
+                                            }
+                                        </mat-form-field>
+                                    </div>
+                                }
+
+                                <div class="flex w-full flex-row justify-end">
+                                    <button
+                                        class="rounded-md border border-transparent px-4 py-2 text-center text-sm text-slate-600 transition-all hover:bg-slate-100 focus:bg-slate-100 active:bg-slate-100"
+                                        type="button"
+                                        (click)="closeDialog()"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        class="ml-2 rounded-md border border-transparent bg-nybble-theme px-4 py-2 text-center text-sm text-white shadow-md transition-all hover:bg-nybble-theme focus:bg-nybble-theme active:bg-nybble-theme"
+                                        [disabled]="userForm.disabled"
+                                        (click)="
+                                            addOrEdit(userForm.get('id').value)
+                                        "
+                                    >
+                                        @if (!showButtonSpinner) {
+                                            <span>{{
+                                                isEditMode ? 'Update' : 'Add'
+                                            }}</span>
+                                        } @else {
+                                            <mat-progress-spinner
+                                                [diameter]="20"
+                                                [mode]="'indeterminate'"
+                                            ></mat-progress-spinner>
+                                        }
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+</div>

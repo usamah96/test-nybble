@@ -25,7 +25,7 @@ import { FuseAlertComponent, FuseAlertType } from '@fuse/components/alert';
 import { FuseValidators } from '@fuse/validators';
 import { AuthService } from 'app/core/auth/auth.service';
 import { UserService } from 'app/core/user/user.service';
-import { User } from 'app/core/user/user.types';
+import { LoginUser } from 'app/shared/types/shared.types';
 import { Subject, finalize, takeUntil } from 'rxjs';
 
 @Component({
@@ -58,7 +58,7 @@ export class AuthChangePasswordComponent implements OnInit {
     changePasswordForm: UntypedFormGroup;
     showAlert: boolean = false;
     showForm: boolean = true;
-    user: User;
+    user: LoginUser;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     constructor(
@@ -71,7 +71,7 @@ export class AuthChangePasswordComponent implements OnInit {
     ngOnInit(): void {
         this._userService.user$
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((user: User) => {
+            .subscribe((user: LoginUser) => {
                 this.user = user;
                 this._changeDetectorRef.markForCheck();
             });

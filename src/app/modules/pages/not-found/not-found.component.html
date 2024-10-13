@@ -1,0 +1,31 @@
+<div class="flex h-screen w-screen items-center justify-center bg-gray-100">
+    <div class="text-center">
+        <svg
+            class="mx-auto h-24 w-24 text-gray-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+        >
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9.75 7.75a4.25 4.25 0 117.61 3.375c.492.085.971.243 1.415.464a4.243 4.243 0 010 7.64m-8.905-.078a4.254 4.254 0 01-1.91-4.062c.016-.326.08-.645.191-.949a4.256 4.256 0 01-3.67-4.414m5.58 8.035a4.255 4.255 0 004.812-.201m-6.427-.205a4.255 4.255 0 01-.972-2.12"
+            />
+        </svg>
+
+        <!-- 404 Message -->
+        <h1 class="text-5xl font-bold text-gray-800">404</h1>
+        <p class="mt-4 text-lg text-gray-600">
+            Oops! The page you're looking for doesn't exist.
+        </p>
+
+        <!-- Home Button -->
+        <button
+            class="mt-6 w-full rounded bg-nybble-theme px-4 py-2 text-white hover:bg-blue-700"
+        >
+            <a [routerLink]="['/sign-in']">Go Back </a>
+        </button>
+    </div>
+</div>

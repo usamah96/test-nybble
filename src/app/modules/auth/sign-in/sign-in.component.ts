@@ -45,6 +45,7 @@ export class AuthSignInComponent implements OnInit {
         type: 'success',
         message: '',
     };
+
     signInForm: UntypedFormGroup;
     showAlert: boolean = false;
 
@@ -76,7 +77,7 @@ export class AuthSignInComponent implements OnInit {
                 const redirectURL =
                     this._activatedRoute.snapshot.queryParamMap.get(
                         'redirectURL'
-                    ) || '/signed-in-redirect';
+                    ) || '/dashboard';
 
                 this._router.navigateByUrl(redirectURL);
             },

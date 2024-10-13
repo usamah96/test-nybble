@@ -1,0 +1,637 @@
+<div
+    class="bg-card flex min-w-0 flex-auto flex-col dark:bg-transparent sm:absolute sm:inset-0 sm:overflow-hidden"
+>
+    <div
+        class="relative flex flex-0 flex-col border-b p-5 sm:flex-row sm:items-center sm:justify-between"
+    >
+        @if (isLoading) {
+            <div class="absolute inset-x-0 bottom-0">
+                <mat-progress-bar [mode]="'indeterminate'"></mat-progress-bar>
+            </div>
+        }
+        <div class="grid-col-3 grid w-full gap-3 md:flex md:flex-row">
+            <div>
+                <mat-form-field
+                    class="fuse-mat-dense fuse-mat-rounded min-w-50"
+                    [subscriptSizing]="'dynamic'"
+                >
+                    <input
+                        matInput
+                        #codeSearch
+                        [autocomplete]="'off'"
+                        [placeholder]="'Code'"
+                    />
+                </mat-form-field>
+            </div>
+            <div>
+                <mat-form-field
+                    class="fuse-mat-dense fuse-mat-rounded min-w-50"
+                    [subscriptSizing]="'dynamic'"
+                >
+                    <input
+                        matInput
+                        #nameSearch
+                        [autocomplete]="'off'"
+                        [placeholder]="'Name'"
+                    />
+                </mat-form-field>
+            </div>
+            <div>
+                <mat-form-field
+                    class="fuse-mat-dense fuse-mat-rounded min-w-50"
+                    [subscriptSizing]="'dynamic'"
+                >
+                    <input
+                        matInput
+                        #shortNameSearch
+                        [autocomplete]="'off'"
+                        [placeholder]="'Short Name'"
+                    />
+                </mat-form-field>
+            </div>
+            <div>
+                <mat-form-field
+                    class="fuse-mat-dense fuse-mat-rounded min-w-50"
+                    [subscriptSizing]="'dynamic'"
+                >
+                    <input
+                        matInput
+                        #townSearch
+                        [autocomplete]="'off'"
+                        [placeholder]="'Town'"
+                    />
+                </mat-form-field>
+            </div>
+            <div>
+                <mat-form-field
+                    class="fuse-mat-dense fuse-mat-rounded min-w-50"
+                    [subscriptSizing]="'dynamic'"
+                >
+                    <input
+                        matInput
+                        #countySearch
+                        [autocomplete]="'off'"
+                        [placeholder]="'County'"
+                    />
+                </mat-form-field>
+            </div>
+        </div>
+        <button
+            class="mt-4 max-w-[20%] bg-nybble-theme text-white md:mt-0 md:justify-end"
+            mat-flat-button
+            (click)="openDialog()"
+        >
+            <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+            <span>Add Branch</span>
+        </button>
+    </div>
+
+    @if (branches$ | async; as branches) {
+        @if (branches.length > 0) {
+            <div
+                class="relative flex flex-col overflow-scroll rounded-lg bg-white bg-clip-border pb-16 text-gray-700"
+            >
+                <table
+                    class="min-w-max table-auto text-left"
+                    [ngClass]="{ 'blur-sm': isLoading }"
+                >
+                    <thead>
+                        <tr>
+                            <th
+                                class="border-b border-slate-200 bg-slate-100 p-4 text-center"
+                            >
+                                <p
+                                    class="text-md font-bold leading-none text-slate-500"
+                                >
+                                    Branch Code
+                                </p>
+                            </th>
+                            <th
+                                class="border-b border-slate-200 bg-slate-100 p-4 text-center"
+                            >
+                                <p
+                                    class="text-md font-bold leading-none text-slate-500"
+                                >
+                                    Short Name
+                                </p>
+                            </th>
+                            <th
+                                class="border-b border-slate-200 bg-slate-100 p-4 text-center"
+                            >
+                                <p
+                                    class="text-md font-bold leading-none text-slate-500"
+                                >
+                                    Branch
+                                </p>
+                            </th>
+                            <th
+                                class="border-b border-slate-200 bg-slate-100 p-4 text-center"
+                            >
+                                <p
+                                    class="text-md font-bold leading-none text-slate-500"
+                                >
+                                    Town
+                                </p>
+                            </th>
+                            <th
+                                class="border-b border-slate-200 bg-slate-100 p-4 text-center"
+                            >
+                                <p
+                                    class="text-md font-bold leading-none text-slate-500"
+                                >
+                                    County
+                                </p>
+                            </th>
+                            <th
+                                class="border-b border-slate-200 bg-slate-100 p-4 text-center"
+                            >
+                                <p
+                                    class="text-md font-bold leading-none text-slate-500"
+                                >
+                                    Actions
+                                </p>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (branches$ | async; as branches) {
+                            @for (
+                                branch of branches;
+                                track trackByFn($index, branch)
+                            ) {
+                                <tr
+                                    class="border-b border-slate-200 hover:bg-slate-50"
+                                >
+                                    <td class="p-4 py-5 text-center">
+                                        <p class="text-sm text-slate-500">
+                                            {{ branch.code }}
+                                        </p>
+                                    </td>
+                                    <td class="p-4 py-5 text-center">
+                                        <p class="text-sm text-slate-500">
+                                            {{ branch.shortName }}
+                                        </p>
+                                    </td>
+                                    <td class="p-4 py-5 text-center">
+                                        <p class="text-sm text-slate-500">
+                                            {{ branch.name }}
+                                        </p>
+                                    </td>
+                                    <td class="p-4 py-5 text-center">
+                                        <p class="text-sm text-slate-500">
+                                            {{ branch.town }}
+                                        </p>
+                                    </td>
+                                    <td class="p-4 py-5 text-center">
+                                        <p class="text-sm text-slate-500">
+                                            {{ branch.county }}
+                                        </p>
+                                    </td>
+                                    <td class="p-4 py-5 text-center">
+                                        <button
+                                            class="h-7 min-h-7 min-w-10 px-2 leading-6"
+                                            (click)="edit(branch.id)"
+                                        >
+                                            <mat-icon
+                                                class="icon-size-5"
+                                                [svgIcon]="
+                                                    'heroicons_solid:pencil'
+                                                "
+                                            ></mat-icon>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div>
+                <mat-paginator
+                    class="z-10 border-b bg-gray-50 dark:bg-transparent sm:absolute sm:inset-x-0 sm:bottom-0 sm:border-b-0 sm:border-t"
+                    [ngClass]="{ 'pointer-events-none': isLoading }"
+                    [length]="'23'"
+                    [pageIndex]="'1'"
+                    [pageSize]="'10'"
+                    [pageSizeOptions]="[5, 10, 25, 100]"
+                    [showFirstLastButtons]="true"
+                    (page)="setPageFilter($event)"
+                ></mat-paginator>
+            </div>
+        } @else {
+            <div
+                class="border-t p-8 text-center text-4xl font-semibold tracking-tight sm:p-16"
+            >
+                There are no branches!
+            </div>
+        }
+    }
+    @if (isDialogOpen) {
+        <div
+            class="fixed inset-0 z-[999] grid h-screen w-screen place-items-center overflow-y-auto bg-black bg-opacity-60 backdrop-blur-sm transition-opacity duration-300"
+        >
+            <div
+                class="relative m-4 max-w-[100%] rounded-lg bg-white p-4 shadow-sm md:w-3/5 lg:w-3/5"
+            >
+                @if (showAlert) {
+                    <div
+                        class="relative mb-4 mt-2 rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700"
+                        role="alert"
+                    >
+                        <span class="block sm:inline"
+                            >Something seriously bad happened.</span
+                        >
+                        <span
+                            class="absolute bottom-0 right-0 top-0 px-4 py-3"
+                            (click)="closeAlert()"
+                        >
+                            <svg
+                                class="h-6 w-6 fill-current text-red-500"
+                                role="button"
+                                viewBox="0 0 20 20"
+                            >
+                                <title>Close</title>
+                                <path
+                                    d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"
+                                />
+                            </svg>
+                        </span>
+                    </div>
+                }
+                <div
+                    class="flex items-center pb-4 text-xl font-medium text-slate-800"
+                >
+                    Add Branch
+                </div>
+                <div
+                    class="relative border-t border-slate-200 py-4 font-light leading-normal text-slate-600"
+                >
+                    <form class="flex w-full flex-row" [formGroup]="branchForm">
+                        <div class="flex flex-row">
+                            <div class="flex flex-auto flex-wrap">
+                                <div class="flex w-full flex-row gap-3 p-2">
+                                    <mat-form-field class="w-full">
+                                        <mat-label>Code</mat-label>
+                                        <mat-icon
+                                            class="icon-size-5"
+                                            matPrefix
+                                            [svgIcon]="
+                                                'heroicons_solid:qr-code'
+                                            "
+                                        ></mat-icon>
+                                        <input
+                                            matInput
+                                            [formControlName]="'code'"
+                                        />
+                                        @if (
+                                            branchForm
+                                                .get('code')
+                                                .hasError('required')
+                                        ) {
+                                            <mat-error>
+                                                Code is required
+                                            </mat-error>
+                                        }
+                                    </mat-form-field>
+                                    <mat-form-field class="w-full">
+                                        <mat-label>Short Name</mat-label>
+                                        <mat-icon
+                                            class="icon-size-5"
+                                            matPrefix
+                                            [svgIcon]="
+                                                'heroicons_solid:globe-alt'
+                                            "
+                                        ></mat-icon>
+                                        <input
+                                            matInput
+                                            [formControlName]="'shortName'"
+                                        />
+                                        @if (
+                                            branchForm
+                                                .get('shortName')
+                                                .hasError('required')
+                                        ) {
+                                            <mat-error>
+                                                Short Name is required
+                                            </mat-error>
+                                        }
+                                    </mat-form-field>
+                                    <mat-form-field class="w-full">
+                                        <mat-label>Name</mat-label>
+                                        <mat-icon
+                                            class="icon-size-5"
+                                            matPrefix
+                                            [svgIcon]="'heroicons_solid:user'"
+                                        ></mat-icon>
+                                        <input
+                                            matInput
+                                            [formControlName]="'name'"
+                                        />
+                                        @if (
+                                            branchForm
+                                                .get('name')
+                                                .hasError('required')
+                                        ) {
+                                            <mat-error>
+                                                Name is required
+                                            </mat-error>
+                                        }
+                                    </mat-form-field>
+                                </div>
+
+                                <div class="flex w-full flex-row gap-3 p-2">
+                                    <mat-form-field class="w-full">
+                                        <mat-label>Address 1</mat-label>
+                                        <mat-icon
+                                            class="icon-size-5"
+                                            matPrefix
+                                            [svgIcon]="'heroicons_solid:home'"
+                                        ></mat-icon>
+                                        <input
+                                            matInput
+                                            [formControlName]="'addressOne'"
+                                        />
+                                        @if (
+                                            branchForm
+                                                .get('addressOne')
+                                                .hasError('required')
+                                        ) {
+                                            <mat-error>
+                                                Address 1 is required
+                                            </mat-error>
+                                        }
+                                    </mat-form-field>
+                                    <mat-form-field class="w-full">
+                                        <mat-label>Address 2</mat-label>
+                                        <mat-icon
+                                            class="icon-size-5"
+                                            matPrefix
+                                            [svgIcon]="'heroicons_solid:home'"
+                                        ></mat-icon>
+                                        <input
+                                            matInput
+                                            [formControlName]="'addressTwo'"
+                                        />
+                                        @if (
+                                            branchForm
+                                                .get('addressTwo')
+                                                .hasError('required')
+                                        ) {
+                                            <mat-error>
+                                                Address 2 is required
+                                            </mat-error>
+                                        }
+                                    </mat-form-field>
+                                    <mat-form-field class="w-full">
+                                        <mat-label>Address 3</mat-label>
+                                        <mat-icon
+                                            class="icon-size-5"
+                                            matPrefix
+                                            [svgIcon]="'heroicons_solid:home'"
+                                        ></mat-icon>
+                                        <input
+                                            matInput
+                                            [formControlName]="'addressThree'"
+                                        />
+                                    </mat-form-field>
+                                </div>
+
+                                <div class="flex w-full flex-row gap-3 p-2">
+                                    <mat-form-field class="w-full">
+                                        <mat-label>Town</mat-label>
+                                        <mat-icon
+                                            class="icon-size-5"
+                                            matPrefix
+                                            [svgIcon]="'heroicons_solid:home'"
+                                        ></mat-icon>
+                                        <input
+                                            matInput
+                                            [formControlName]="'town'"
+                                        />
+                                        @if (
+                                            branchForm
+                                                .get('town')
+                                                .hasError('required')
+                                        ) {
+                                            <mat-error>
+                                                Town is required
+                                            </mat-error>
+                                        }
+                                    </mat-form-field>
+                                    <mat-form-field class="w-full">
+                                        <mat-label>County</mat-label>
+                                        <mat-icon
+                                            class="icon-size-5"
+                                            matPrefix
+                                            [svgIcon]="'heroicons_solid:home'"
+                                        ></mat-icon>
+                                        <input
+                                            matInput
+                                            [formControlName]="'county'"
+                                        />
+                                        @if (
+                                            branchForm
+                                                .get('county')
+                                                .hasError('required')
+                                        ) {
+                                            <mat-error>
+                                                County is required
+                                            </mat-error>
+                                        }
+                                    </mat-form-field>
+                                    <mat-form-field class="w-full">
+                                        <mat-label>Country</mat-label>
+                                        <mat-icon
+                                            class="icon-size-5"
+                                            matPrefix
+                                            [svgIcon]="'heroicons_solid:home'"
+                                        ></mat-icon>
+                                        <input
+                                            matInput
+                                            [formControlName]="'country'"
+                                        />
+                                        @if (
+                                            branchForm
+                                                .get('country')
+                                                .hasError('required')
+                                        ) {
+                                            <mat-error>
+                                                Country is required
+                                            </mat-error>
+                                        }
+                                    </mat-form-field>
+                                </div>
+
+                                <div class="flex w-full flex-row gap-3 p-2">
+                                    <mat-form-field class="w-full">
+                                        <mat-label>Postcode</mat-label>
+                                        <mat-icon
+                                            class="icon-size-5"
+                                            matPrefix
+                                            [svgIcon]="'heroicons_solid:home'"
+                                        ></mat-icon>
+                                        <input
+                                            matInput
+                                            [formControlName]="'postcode'"
+                                        />
+                                        @if (
+                                            branchForm
+                                                .get('postcode')
+                                                .hasError('required')
+                                        ) {
+                                            <mat-error>
+                                                Postcode is required
+                                            </mat-error>
+                                        }
+                                    </mat-form-field>
+                                    <mat-form-field class="w-full">
+                                        <mat-label>Phone</mat-label>
+                                        <mat-icon
+                                            class="icon-size-5"
+                                            matPrefix
+                                            [svgIcon]="'heroicons_solid:phone'"
+                                        ></mat-icon>
+                                        <input
+                                            matInput
+                                            [formControlName]="'phone'"
+                                        />
+                                        @if (
+                                            branchForm
+                                                .get('phone')
+                                                .hasError('required')
+                                        ) {
+                                            <mat-error>
+                                                Phone is required
+                                            </mat-error>
+                                        }
+                                    </mat-form-field>
+                                    <mat-form-field class="w-full">
+                                        <mat-label>Fax</mat-label>
+                                        <mat-icon
+                                            class="icon-size-5"
+                                            matPrefix
+                                            [svgIcon]="
+                                                'heroicons_solid:computer-desktop'
+                                            "
+                                        ></mat-icon>
+                                        <input
+                                            matInput
+                                            [formControlName]="'fax'"
+                                        />
+                                        @if (
+                                            branchForm
+                                                .get('fax')
+                                                .hasError('required')
+                                        ) {
+                                            <mat-error>
+                                                Fax is required
+                                            </mat-error>
+                                        }
+                                    </mat-form-field>
+                                </div>
+
+                                <div class="flex w-full flex-row gap-3 p-2">
+                                    <mat-form-field class="w-full">
+                                        <mat-label
+                                            >Branch Status Email</mat-label
+                                        >
+                                        <mat-icon
+                                            class="icon-size-5"
+                                            matPrefix
+                                            [svgIcon]="
+                                                'heroicons_solid:envelope'
+                                            "
+                                        ></mat-icon>
+                                        <input
+                                            matInput
+                                            [formControlName]="
+                                                'branchStatusEmail'
+                                            "
+                                        />
+                                    </mat-form-field>
+                                    <mat-form-field class="w-full">
+                                        <mat-label>Branch Status</mat-label>
+                                        <mat-icon
+                                            class="icon-size-5"
+                                            matPrefix
+                                            [svgIcon]="
+                                                'heroicons_solid:list-bullet'
+                                            "
+                                        ></mat-icon>
+                                        <mat-select
+                                            [formControlName]="'branchStatus'"
+                                        >
+                                            @for (
+                                                branchStatus of branchStatuses;
+                                                track branchStatus
+                                            ) {
+                                                <mat-option
+                                                    [value]="branchStatus.id"
+                                                    >{{
+                                                        branchStatus.name
+                                                    }}</mat-option
+                                                >
+                                            }
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+
+                                <div class="flex w-full flex-row gap-3 p-2">
+                                    <mat-form-field class="w-full">
+                                        <mat-label
+                                            >Branch Status Email Body</mat-label
+                                        >
+                                        <mat-icon
+                                            class="icon-size-5"
+                                            matPrefix
+                                            [svgIcon]="
+                                                'heroicons_solid:envelope'
+                                            "
+                                        ></mat-icon>
+                                        <textarea
+                                            matInput
+                                            [formControlName]="
+                                                'branchStatusEmailBody'
+                                            "
+                                        ></textarea>
+                                    </mat-form-field>
+                                </div>
+
+                                <div class="flex w-full flex-row justify-end">
+                                    <button
+                                        class="rounded-md border border-transparent px-4 py-2 text-center text-sm text-slate-600 transition-all hover:bg-slate-100 focus:bg-slate-100 active:bg-slate-100"
+                                        type="button"
+                                        (click)="closeDialog()"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        class="ml-2 rounded-md border border-transparent bg-nybble-theme px-4 py-2 text-center text-sm text-white shadow-md transition-all hover:bg-nybble-theme focus:bg-nybble-theme active:bg-nybble-theme"
+                                        [disabled]="branchForm.disabled"
+                                        (click)="
+                                            addOrEdit(
+                                                branchForm.get('id').value
+                                            )
+                                        "
+                                    >
+                                        @if (!showButtonSpinner) {
+                                            <span>{{
+                                                isEditMode ? 'Update' : 'Add'
+                                            }}</span>
+                                        } @else {
+                                            <mat-progress-spinner
+                                                [diameter]="20"
+                                                [mode]="'indeterminate'"
+                                            ></mat-progress-spinner>
+                                        }
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+</div>
