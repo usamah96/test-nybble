@@ -1,8 +1,10 @@
+import { inject } from '@angular/core';
 import { Route } from '@angular/router';
 import { initialDataResolver } from 'app/app.resolvers';
 import { AuthGuard } from 'app/core/auth/guards/auth.guard';
 import { NoAuthGuard } from 'app/core/auth/guards/noAuth.guard';
 import { LayoutComponent } from 'app/layout/layout.component';
+import { SharedService } from './shared/service/shared.service';
 
 export const appRoutes: Route[] = [
     { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
@@ -35,6 +37,11 @@ export const appRoutes: Route[] = [
                 path: 'sign-in',
                 loadChildren: () =>
                     import('app/modules/auth/sign-in/sign-in.routes'),
+            },
+            {
+                path: 'not-found',
+                loadChildren: () =>
+                    import('app/modules/pages/not-found/not-found.routes'),
             },
         ],
     },
@@ -71,7 +78,7 @@ export const appRoutes: Route[] = [
         children: [
             {
                 path: 'dashboard',
-                data: { roles: ['ADMIN', 'INTERNAL_USER'] },
+                data: { roles: ['ADMIN', 'INTERNAL_USER', 'CUSTOMER'] },
                 loadChildren: () =>
                     import('app/modules/pages/dashboard/dashboard.routes'),
             },
@@ -80,6 +87,11 @@ export const appRoutes: Route[] = [
                 data: { roles: ['ADMIN'] },
                 loadChildren: () =>
                     import('app/modules/pages/user/user.routes'),
+                resolve: {
+                    branches: () => inject(SharedService).nameSummary('branch'),
+                    customers: () =>
+                        inject(SharedService).nameSummary('invoice/customer'),
+                },
             },
             {
                 path: 'branch',
@@ -92,11 +104,6 @@ export const appRoutes: Route[] = [
                 data: { roles: ['ADMIN', 'INTERNAL_USER'] },
                 loadChildren: () =>
                     import('app/modules/pages/customer/customer.routes'),
-            },
-            {
-                path: 'not-found',
-                loadChildren: () =>
-                    import('app/modules/pages/not-found/not-found.routes'),
             },
         ],
     },

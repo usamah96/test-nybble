@@ -1,0 +1,47 @@
+<div class="w-full max-w-xs rounded-lg bg-white p-6 text-center">
+    @if (data.type === 'success') {
+        <svg
+            class="mx-auto mb-4 h-16 w-16 text-green-500"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+        >
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 13l4 4L19 7"
+            />
+        </svg>
+    } @else {
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            class="mx-auto mb-4 h-16 w-16 text-red-500"
+        >
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+            />
+        </svg>
+    }
+
+    <h2 class="text-lg font-semibold text-gray-900">{{ data.title }}</h2>
+    <p class="mt-2 text-gray-600">{{ data.message }}</p>
+
+    <mat-dialog-actions class="flex justify-center">
+        <button
+            class="mt-5 rounded bg-nybble-theme px-4 py-2 text-white"
+            mat-button
+            [mat-dialog-close]="true"
+            cdkFocusInitial
+        >
+            Ok
+        </button>
+    </mat-dialog-actions>
+</div>

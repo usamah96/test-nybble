@@ -18,6 +18,14 @@
                     <input
                         matInput
                         #codeSearch
+                        (keydown.enter)="
+                            applyFilter(
+                                codeSearch.value,
+                                nameSearch.value,
+                                invoiceEmailSearch.value,
+                                contactNameSearch.value
+                            )
+                        "
                         [autocomplete]="'off'"
                         [placeholder]="'Code'"
                     />
@@ -31,6 +39,14 @@
                     <input
                         matInput
                         #nameSearch
+                        (keydown.enter)="
+                            applyFilter(
+                                codeSearch.value,
+                                nameSearch.value,
+                                invoiceEmailSearch.value,
+                                contactNameSearch.value
+                            )
+                        "
                         [autocomplete]="'off'"
                         [placeholder]="'Name'"
                     />
@@ -44,6 +60,14 @@
                     <input
                         matInput
                         #invoiceEmailSearch
+                        (keydown.enter)="
+                            applyFilter(
+                                codeSearch.value,
+                                nameSearch.value,
+                                invoiceEmailSearch.value,
+                                contactNameSearch.value
+                            )
+                        "
                         [autocomplete]="'off'"
                         [placeholder]="'Invoice Email'"
                     />
@@ -57,6 +81,14 @@
                     <input
                         matInput
                         #contactNameSearch
+                        (keydown.enter)="
+                            applyFilter(
+                                codeSearch.value,
+                                nameSearch.value,
+                                invoiceEmailSearch.value,
+                                contactNameSearch.value
+                            )
+                        "
                         [autocomplete]="'off'"
                         [placeholder]="'Contact Name'"
                     />
@@ -73,151 +105,135 @@
         </button>
     </div>
 
-    @if (customer$ | async; as customers) {
-        @if (customers.length > 0) {
-            <div
-                class="relative flex flex-col overflow-scroll rounded-lg bg-white bg-clip-border pb-16 text-gray-700"
-            >
-                <table
-                    class="min-w-max table-auto text-left"
-                    [ngClass]="{ 'blur-sm': isLoading }"
-                >
-                    <thead>
-                        <tr>
-                            <th
-                                class="border-b border-slate-200 bg-slate-100 p-4 text-center"
+    <div
+        class="relative flex flex-col overflow-scroll rounded-lg bg-white bg-clip-border pb-16 text-gray-700"
+    >
+        <table
+            class="min-w-max table-auto text-left"
+            [ngClass]="{ 'blur-sm': isLoading }"
+        >
+            <thead>
+                <tr>
+                    <th
+                        class="border-b border-slate-200 bg-slate-100 p-4 text-center"
+                    >
+                        <p
+                            class="text-md font-bold leading-none text-slate-500"
+                        >
+                            Customer Name
+                        </p>
+                    </th>
+                    <th
+                        class="border-b border-slate-200 bg-slate-100 p-4 text-center"
+                    >
+                        <p
+                            class="text-md font-bold leading-none text-slate-500"
+                        >
+                            Code
+                        </p>
+                    </th>
+                    <th
+                        class="border-b border-slate-200 bg-slate-100 p-4 text-center"
+                    >
+                        <p
+                            class="text-md font-bold leading-none text-slate-500"
+                        >
+                            Invoice Email
+                        </p>
+                    </th>
+                    <th
+                        class="border-b border-slate-200 bg-slate-100 p-4 text-center"
+                    >
+                        <p
+                            class="text-md font-bold leading-none text-slate-500"
+                        >
+                            Address
+                        </p>
+                    </th>
+                    <th
+                        class="border-b border-slate-200 bg-slate-100 p-4 text-center"
+                    >
+                        <p
+                            class="text-md font-bold leading-none text-slate-500"
+                        >
+                            Contact Name
+                        </p>
+                    </th>
+                    <th
+                        class="border-b border-slate-200 bg-slate-100 p-4 text-center"
+                    >
+                        <p
+                            class="text-md font-bold leading-none text-slate-500"
+                        >
+                            Actions
+                        </p>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (
+                    customer of customers;
+                    track trackByFn($index, customer)
+                ) {
+                    <tr class="border-b border-slate-200 hover:bg-slate-50">
+                        <td class="p-4 py-5 text-center">
+                            <p class="text-sm text-slate-500">
+                                {{ customer.name }}
+                            </p>
+                        </td>
+                        <td class="p-4 py-5 text-center">
+                            <p class="text-sm text-slate-500">
+                                {{ customer.accountCode }}
+                            </p>
+                        </td>
+                        <td class="p-4 py-5 text-center">
+                            <p class="text-sm text-slate-500">
+                                @if (customer.invoiceEmail) {
+                                    {{ customer.invoiceEmail }}
+                                } @else {
+                                    {{ 'N/A' }}
+                                }
+                            </p>
+                        </td>
+                        <td class="p-4 py-5 text-center">
+                            <p class="text-sm text-slate-500">
+                                {{ customer.address1 }}
+                            </p>
+                        </td>
+                        <td class="p-4 py-5 text-center">
+                            <p class="text-sm text-slate-500">
+                                {{ customer.contactName }}
+                            </p>
+                        </td>
+                        <td class="p-4 py-5 text-center">
+                            <button
+                                class="h-7 min-h-7 min-w-10 px-2 leading-6"
+                                (click)="edit(customer)"
                             >
-                                <p
-                                    class="text-md font-bold leading-none text-slate-500"
-                                >
-                                    Customer Name
-                                </p>
-                            </th>
-                            <th
-                                class="border-b border-slate-200 bg-slate-100 p-4 text-center"
-                            >
-                                <p
-                                    class="text-md font-bold leading-none text-slate-500"
-                                >
-                                    Code
-                                </p>
-                            </th>
-                            <th
-                                class="border-b border-slate-200 bg-slate-100 p-4 text-center"
-                            >
-                                <p
-                                    class="text-md font-bold leading-none text-slate-500"
-                                >
-                                    Invoice Email
-                                </p>
-                            </th>
-                            <th
-                                class="border-b border-slate-200 bg-slate-100 p-4 text-center"
-                            >
-                                <p
-                                    class="text-md font-bold leading-none text-slate-500"
-                                >
-                                    Address
-                                </p>
-                            </th>
-                            <th
-                                class="border-b border-slate-200 bg-slate-100 p-4 text-center"
-                            >
-                                <p
-                                    class="text-md font-bold leading-none text-slate-500"
-                                >
-                                    Contact Name
-                                </p>
-                            </th>
-                            <th
-                                class="border-b border-slate-200 bg-slate-100 p-4 text-center"
-                            >
-                                <p
-                                    class="text-md font-bold leading-none text-slate-500"
-                                >
-                                    Actions
-                                </p>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (customer$ | async; as customer) {
-                            @for (
-                                customer of customers;
-                                track trackByFn($index, customer)
-                            ) {
-                                <tr
-                                    class="border-b border-slate-200 hover:bg-slate-50"
-                                >
-                                    <td class="p-4 py-5 text-center">
-                                        <p class="text-sm text-slate-500">
-                                            {{ customer.name }}
-                                        </p>
-                                    </td>
-                                    <td class="p-4 py-5 text-center">
-                                        <p class="text-sm text-slate-500">
-                                            {{ customer.accountCode }}
-                                        </p>
-                                    </td>
-                                    <td class="p-4 py-5 text-center">
-                                        <p class="text-sm text-slate-500">
-                                            @if (customer.invoiceEmail) {
-                                                {{ customer.invoiceEmail }}
-                                            } @else {
-                                                {{ 'N/A' }}
-                                            }
-                                        </p>
-                                    </td>
-                                    <td class="p-4 py-5 text-center">
-                                        <p class="text-sm text-slate-500">
-                                            {{ customer.addressOne }}
-                                        </p>
-                                    </td>
-                                    <td class="p-4 py-5 text-center">
-                                        <p class="text-sm text-slate-500">
-                                            {{ customer.contactName }}
-                                        </p>
-                                    </td>
-                                    <td class="p-4 py-5 text-center">
-                                        <button
-                                            class="h-7 min-h-7 min-w-10 px-2 leading-6"
-                                            (click)="edit(customer.id)"
-                                        >
-                                            <mat-icon
-                                                class="icon-size-5"
-                                                [svgIcon]="
-                                                    'heroicons_solid:pencil'
-                                                "
-                                            ></mat-icon>
-                                        </button>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                    </tbody>
-                </table>
-            </div>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    [svgIcon]="'heroicons_solid:pencil'"
+                                ></mat-icon>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 
-            <div>
-                <mat-paginator
-                    class="z-10 border-b bg-gray-50 dark:bg-transparent sm:absolute sm:inset-x-0 sm:bottom-0 sm:border-b-0 sm:border-t"
-                    [ngClass]="{ 'pointer-events-none': isLoading }"
-                    [length]="'23'"
-                    [pageIndex]="'1'"
-                    [pageSize]="'10'"
-                    [pageSizeOptions]="[5, 10, 25, 100]"
-                    [showFirstLastButtons]="true"
-                    (page)="setPageFilter($event)"
-                ></mat-paginator>
-            </div>
-        } @else {
-            <div
-                class="border-t p-8 text-center text-4xl font-semibold tracking-tight sm:p-16"
-            >
-                There are no customers!
-            </div>
-        }
-    }
+    <div>
+        <mat-paginator
+            #paginator
+            class="z-10 border-b bg-gray-50 dark:bg-transparent sm:absolute sm:inset-x-0 sm:bottom-0 sm:border-b-0 sm:border-t"
+            [ngClass]="{ 'pointer-events-none': isLoading }"
+            [length]="totalElements"
+            [pageSize]="pageSize"
+            [pageSizeOptions]="[5, 10, 25, 100]"
+            [showFirstLastButtons]="true"
+            (page)="setPageFilter($event)"
+        ></mat-paginator>
+    </div>
     @if (isDialogOpen) {
         <div
             class="fixed inset-0 z-[999] grid h-screen w-screen place-items-center overflow-y-auto bg-black bg-opacity-60 backdrop-blur-sm transition-opacity duration-300"
@@ -225,20 +241,30 @@
             <div
                 class="relative m-4 max-w-[100%] rounded-lg bg-white p-4 shadow-sm md:w-3/5 lg:w-3/5"
             >
-                @if (showAlert) {
+                @if (showErrorAlert || showSuccessAlert) {
                     <div
-                        class="relative mb-4 mt-2 rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700"
+                        class="relative mb-4 mt-2 rounded border px-4 py-3"
+                        [ngClass]="
+                            showErrorAlert
+                                ? 'border-red-400 bg-red-100 text-red-700'
+                                : 'border-green-400 bg-green-100 text-green-700'
+                        "
                         role="alert"
                     >
-                        <span class="block sm:inline"
-                            >Something seriously bad happened.</span
-                        >
+                        <span class="block sm:inline">{{
+                            responseMessage
+                        }}</span>
                         <span
                             class="absolute bottom-0 right-0 top-0 px-4 py-3"
                             (click)="closeAlert()"
                         >
                             <svg
-                                class="h-6 w-6 fill-current text-red-500"
+                                class="h-6 w-6 fill-current"
+                                [ngClass]="
+                                    showErrorAlert
+                                        ? 'text-red-500'
+                                        : 'text-green-500'
+                                "
                                 role="button"
                                 viewBox="0 0 20 20"
                             >
@@ -344,11 +370,11 @@
                                         ></mat-icon>
                                         <input
                                             matInput
-                                            [formControlName]="'addressOne'"
+                                            [formControlName]="'address1'"
                                         />
                                         @if (
                                             customerForm
-                                                .get('addressOne')
+                                                .get('address1')
                                                 .hasError('required')
                                         ) {
                                             <mat-error>
@@ -365,7 +391,7 @@
                                         ></mat-icon>
                                         <input
                                             matInput
-                                            [formControlName]="'addressTwo'"
+                                            [formControlName]="'address2'"
                                         />
                                     </mat-form-field>
                                     <mat-form-field class="w-full">
@@ -377,7 +403,7 @@
                                         ></mat-icon>
                                         <input
                                             matInput
-                                            [formControlName]="'addressThree'"
+                                            [formControlName]="'address3'"
                                         />
                                     </mat-form-field>
                                 </div>
@@ -392,7 +418,7 @@
                                         ></mat-icon>
                                         <input
                                             matInput
-                                            [formControlName]="'addressFour'"
+                                            [formControlName]="'address4'"
                                         />
                                     </mat-form-field>
                                     <mat-form-field class="w-full">
@@ -404,7 +430,7 @@
                                         ></mat-icon>
                                         <input
                                             matInput
-                                            [formControlName]="'addressFive'"
+                                            [formControlName]="'address5'"
                                         />
                                     </mat-form-field>
                                     <mat-form-field class="w-full">
@@ -416,11 +442,11 @@
                                         ></mat-icon>
                                         <input
                                             matInput
-                                            [formControlName]="'postcode'"
+                                            [formControlName]="'postCode'"
                                         />
                                         @if (
                                             customerForm
-                                                .get('postcode')
+                                                .get('postCode')
                                                 .hasError('required')
                                         ) {
                                             <mat-error>
@@ -449,6 +475,32 @@
                                         ) {
                                             <mat-error>
                                                 Phone is required
+                                            </mat-error>
+                                        } @else if (
+                                            customerForm
+                                                .get('phone')
+                                                .hasError('minlength')
+                                        ) {
+                                            <mat-error>
+                                                Phone must be of minimum 11
+                                                length
+                                            </mat-error>
+                                        } @else if (
+                                            customerForm
+                                                .get('phone')
+                                                .hasError('maxlength')
+                                        ) {
+                                            <mat-error>
+                                                Phone must be of maximum 14
+                                                length
+                                            </mat-error>
+                                        } @else if (
+                                            customerForm
+                                                .get('phone')
+                                                .hasError('pattern')
+                                        ) {
+                                            <mat-error>
+                                                Phone must be of valid pattern
                                             </mat-error>
                                         }
                                     </mat-form-field>
@@ -490,7 +542,33 @@
                                                 .hasError('required')
                                         ) {
                                             <mat-error>
-                                                Contact Phone is required
+                                                Phone is required
+                                            </mat-error>
+                                        } @else if (
+                                            customerForm
+                                                .get('contactPhone')
+                                                .hasError('minlength')
+                                        ) {
+                                            <mat-error>
+                                                Phone must be of minimum 11
+                                                length
+                                            </mat-error>
+                                        } @else if (
+                                            customerForm
+                                                .get('contactPhone')
+                                                .hasError('maxlength')
+                                        ) {
+                                            <mat-error>
+                                                Phone must be of maximum 14
+                                                length
+                                            </mat-error>
+                                        } @else if (
+                                            customerForm
+                                                .get('contactPhone')
+                                                .hasError('pattern')
+                                        ) {
+                                            <mat-error>
+                                                Phone must be of valid pattern
                                             </mat-error>
                                         }
                                     </mat-form-field>
@@ -530,6 +608,15 @@
                                             <mat-error>
                                                 Invoice Email is required
                                             </mat-error>
+                                        } @else if (
+                                            customerForm
+                                                .get('invoiceEmail')
+                                                .hasError('email')
+                                        ) {
+                                            <mat-error>
+                                                Please enter a valid email
+                                                address
+                                            </mat-error>
                                         }
                                     </mat-form-field>
                                 </div>
@@ -547,7 +634,9 @@
                                         [disabled]="customerForm.disabled"
                                         (click)="
                                             addOrEdit(
-                                                customerForm.get('id').value
+                                                customerForm.get(
+                                                    'invoiceCustomerId'
+                                                ).value
                                             )
                                         "
                                     >

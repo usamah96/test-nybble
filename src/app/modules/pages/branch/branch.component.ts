@@ -4,6 +4,7 @@ import {
     ChangeDetectorRef,
     Component,
     OnInit,
+    ViewChild,
     ViewEncapsulation,
 } from '@angular/core';
 import {
@@ -15,19 +16,25 @@ import {
     Validators,
 } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSortModule } from '@angular/material/sort';
 import { fuseAnimations } from '@fuse/animations';
 import { FuseAlertComponent } from '@fuse/components/alert';
+import { FeedbackDialogComponent } from 'app/shared/feedback-dialog/feedback-dialog.component';
 import { SharedService } from 'app/shared/service/shared.service';
-import { Branch, BranchStatusType } from 'app/shared/types/shared.types';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import {
+    BranchList,
+    BranchListContent,
+    BranchStatusType,
+} from 'app/shared/types/shared.types';
+import { Subject, finalize, takeUntil } from 'rxjs';
 
 @Component({
     selector: 'branch',
@@ -54,64 +61,75 @@ import { BehaviorSubject, Observable, Subject } from 'rxjs';
     ],
 })
 export class BranchComponent implements OnInit {
-    branches$: Observable<Branch[]>;
+    @ViewChild(MatPaginator) paginator: MatPaginator;
+
+    branchListContent: BranchListContent[] = [];
+    branches: BranchList[] = [];
     branchStatuses: BranchStatusType[];
     searchInputControl: UntypedFormControl = new UntypedFormControl();
-    selectedBranch: Branch | null = null;
     branchForm: UntypedFormGroup;
     isDialogOpen: boolean = false;
     isLoading: boolean = false;
     showAlert: boolean = false;
     showButtonSpinner: boolean = false;
+    showEditSpinner: boolean = false;
     isEditMode: boolean = false;
+    showErrorAlert: boolean = false;
+    showSuccessAlert: boolean = false;
+    responseMessage: string = '';
+    editModeId: number = null;
     idField: number = 2;
+    pageNumber: number = 1;
+    pageIndex: number = 1;
+    pageSize: number = 10;
+    totalElements: number = 0;
+    filterPayload: any = {
+        code: null,
+        shortName: null,
+        name: null,
+        address1: null,
+        town: null,
+        country: null,
+    };
+
+    phonePattern = /^\+[0-9]{11,14}$/;
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
-    branchesSubject = new BehaviorSubject<Branch[]>(null);
 
     constructor(
         private _formBuilder: UntypedFormBuilder,
         private _changeDetectorRef: ChangeDetectorRef,
-        private _sharedService: SharedService
+        private _sharedService: SharedService,
+        private _dialog: MatDialog
     ) {}
 
     ngOnInit(): void {
         this.branchForm = this._formBuilder.group({
-            id: [''],
+            branchId: [null],
             code: ['', [Validators.required]],
             shortName: ['', [Validators.required]],
             name: ['', [Validators.required]],
-            addressOne: ['', Validators.required],
-            addressTwo: ['', Validators.required],
-            addressThree: [''],
+            address1: ['', Validators.required],
+            address2: ['', Validators.required],
+            address3: [''],
             town: ['', Validators.required],
-            postcode: ['', Validators.required],
+            postCode: ['', Validators.required],
             fax: [''],
-            phone: ['', Validators.required],
+            phone: [
+                '',
+                [
+                    Validators.required,
+                    Validators.minLength(11),
+                    Validators.maxLength(14),
+                    Validators.pattern(this.phonePattern),
+                ],
+            ],
             county: ['', Validators.required],
             country: ['', Validators.required],
-            branchStatusEmail: [''],
-            branchStatus: [null],
-            branchStatusEmailBody: [''],
+            email: ['', Validators.email],
+            status: [null],
+            emailBody: [''],
         });
-
-        this.branchesSubject.next([
-            {
-                id: 1,
-                code: 'ABC-123',
-                shortName: 'Short Branch',
-                name: 'My Branch',
-                addressOne: 'Address Line 1',
-                addressTwo: 'Address Line 2',
-                addressThree: 'Address Line 3',
-                town: 'Branch Town',
-                postcode: 'Branch Post Code',
-                fax: 'Branch Fax',
-                phone: '+923310247880',
-                county: 'Branch County',
-                country: 'Branch Country',
-            },
-        ]);
 
         this.branchStatuses = [
             { id: 1, name: 'Outstanding' },
@@ -120,19 +138,51 @@ export class BranchComponent implements OnInit {
             { id: 4, name: 'Part Paid' },
         ];
 
-        this.branches$ = this.branchesSubject.asObservable();
+        this.loadFilteredBranches(this.pageNumber, this.pageSize);
+    }
+
+    loadFilteredBranches(pageNumber: number, pageSize: number) {
+        this.isLoading = true;
+
+        this._sharedService
+            .listFiltered('branch', pageNumber, pageSize, this.filterPayload)
+            .pipe(
+                takeUntil(this._unsubscribeAll),
+                finalize(() => {
+                    this.isLoading = false;
+                    this._changeDetectorRef.markForCheck();
+                })
+            )
+            .subscribe(
+                (res: BranchListContent) => {
+                    this.branches = res.content;
+                    this.totalElements = res.totalElements;
+                },
+                (err) => {
+                    this.branches = [];
+                    this.totalElements = 0;
+                }
+            );
     }
 
     setPageFilter(ev) {
-        this.isLoading = true;
-        setTimeout(() => {
-            this.isLoading = false;
-            this._changeDetectorRef.markForCheck();
-        }, 2000);
-        console.log('Ev', ev);
+        this.pageSize = ev.pageSize;
+        this.loadFilteredBranches(ev.pageIndex + 1, ev.pageSize);
     }
 
-    trackByFn(index: number, item: Branch): any {
+    applyFilter(code: string, name: string, shortName: string, town: string) {
+        this.paginator.firstPage();
+
+        this.filterPayload = {
+            code: code === '' ? null : code,
+            name: name === '' ? null : name,
+            shortName: shortName === '' ? null : shortName,
+            town: town === '' ? null : town,
+        };
+        this.loadFilteredBranches(this.pageNumber, this.pageSize);
+    }
+
+    trackByFn(index: number, item: any): any {
         return item.id || index;
     }
 
@@ -146,9 +196,13 @@ export class BranchComponent implements OnInit {
     }
 
     cleanUp() {
+        this.isLoading = false;
         this.isDialogOpen = false;
         this.isEditMode = false;
         this.showButtonSpinner = false;
+        this.showSuccessAlert = false;
+        this.showErrorAlert = false;
+        this.responseMessage = '';
     }
 
     addOrEdit(id: number) {
@@ -157,32 +211,98 @@ export class BranchComponent implements OnInit {
         }
 
         this.showButtonSpinner = true;
-        setTimeout(() => {
-            if (!this.isEditMode) {
-                this.branchForm.value.id = this.idField++;
-                this.branchesSubject.next([
-                    ...this.branchesSubject.value,
-                    this.branchForm.value,
-                ]);
-            } else {
-                this.branchesSubject.value[id - 1] = this.branchForm.value;
-            }
 
-            this.branchForm.reset();
-            this.cleanUp();
-            this._changeDetectorRef.markForCheck();
-        }, 2000);
+        let req;
+        let resposneMsg;
+        if (!id) {
+            req = this._sharedService.post(
+                'branch',
+                'create',
+                this.branchForm.value
+            );
+            resposneMsg = 'Branch Created Successfuly';
+        } else {
+            req = this._sharedService.put(
+                'branch',
+                `update/${id}`,
+                this.branchForm.value
+            );
+            resposneMsg = 'Branch Updated Successfuly';
+        }
+
+        req.pipe(
+            takeUntil(this._unsubscribeAll),
+            finalize(() => {
+                this.showButtonSpinner = false;
+                this._changeDetectorRef.markForCheck();
+            })
+        ).subscribe(
+            (_) => {
+                this.showSuccessAlert = false;
+                this.showErrorAlert = false;
+                this.isDialogOpen = false;
+                this._dialog
+                    .open(FeedbackDialogComponent, {
+                        width: '400px',
+                        height: '310px',
+                        data: {
+                            title: 'Success',
+                            message: resposneMsg,
+                            type: 'success',
+                        },
+                    })
+                    .afterClosed()
+                    .subscribe((_) => {
+                        this.paginator.firstPage();
+                        this.loadFilteredBranches(
+                            this.pageNumber,
+                            this.pageSize
+                        );
+                    });
+            },
+            (err) => {
+                this.showSuccessAlert = false;
+                this.showErrorAlert = true;
+                this.responseMessage =
+                    err.error?.message || 'Unexpected Error Occurred';
+            }
+        );
     }
 
-    edit(id: number) {
+    edit(branch: BranchList) {
+        this.isLoading = true;
         this.isEditMode = true;
-        const branch: Branch = this.branchesSubject.value[id - 1];
 
-        this.branchForm.patchValue(branch);
-        this.openDialog();
+        this._sharedService
+            .get('branch', `get/${branch.branchId}`)
+            .pipe(
+                takeUntil(this._unsubscribeAll),
+                finalize(() => {
+                    this.isLoading = false;
+                    this._changeDetectorRef.markForCheck();
+                })
+            )
+            .subscribe(
+                (res: BranchList) => {
+                    this.branchForm.patchValue(res);
+                    this.openDialog();
+                },
+                (_) => {
+                    this._dialog.open(FeedbackDialogComponent, {
+                        width: '400px',
+                        height: '310px',
+                        data: {
+                            title: 'Success',
+                            message: 'Unable To Fetch Branch Data',
+                            type: 'error',
+                        },
+                    });
+                }
+            );
     }
 
     closeAlert() {
-        this.showAlert = false;
+        this.showErrorAlert = false;
+        this.showSuccessAlert = false;
     }
 }

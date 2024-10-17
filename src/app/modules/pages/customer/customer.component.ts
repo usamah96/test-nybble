@@ -4,6 +4,7 @@ import {
     ChangeDetectorRef,
     Component,
     OnInit,
+    ViewChild,
     ViewEncapsulation,
 } from '@angular/core';
 import {
@@ -15,18 +16,23 @@ import {
     Validators,
 } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSortModule } from '@angular/material/sort';
 import { fuseAnimations } from '@fuse/animations';
 import { FuseAlertComponent } from '@fuse/components/alert';
+import { FeedbackDialogComponent } from 'app/shared/feedback-dialog/feedback-dialog.component';
 import { SharedService } from 'app/shared/service/shared.service';
-import { Branch, Customer } from 'app/shared/types/shared.types';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import {
+    CustomerList,
+    CustomerListContent,
+} from 'app/shared/types/shared.types';
+import { Subject, finalize, takeUntil } from 'rxjs';
 
 @Component({
     selector: 'customer',
@@ -52,78 +58,132 @@ import { BehaviorSubject, Observable, Subject } from 'rxjs';
     ],
 })
 export class CustomerComponent implements OnInit {
-    customer$: Observable<Customer[]>;
+    @ViewChild(MatPaginator) paginator: MatPaginator;
+
+    customerListContent: CustomerListContent[] = [];
+    customers: CustomerList[] = [];
     searchInputControl: UntypedFormControl = new UntypedFormControl();
-    selectedCustomer: Customer | null = null;
     customerForm: UntypedFormGroup;
     isDialogOpen: boolean = false;
     isLoading: boolean = false;
     showAlert: boolean = false;
     showButtonSpinner: boolean = false;
     isEditMode: boolean = false;
+    showErrorAlert: boolean = false;
+    showSuccessAlert: boolean = false;
+    responseMessage: string = '';
     idField: number = 2;
+    pageNumber: number = 1;
+    pageIndex: number = 1;
+    pageSize: number = 10;
+    totalElements: number = 0;
+    filterPayload: any = {
+        accountCode: null,
+        name: null,
+        invoiceEmail: null,
+        contactName: null,
+    };
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
-    customerSubject = new BehaviorSubject<Customer[]>(null);
+    phonePattern = /^\+[0-9]{11,14}$/;
 
     constructor(
         private _formBuilder: UntypedFormBuilder,
         private _changeDetectorRef: ChangeDetectorRef,
-        private _sharedService: SharedService
+        private _sharedService: SharedService,
+        private _dialog: MatDialog
     ) {}
 
     ngOnInit(): void {
         this.customerForm = this._formBuilder.group({
-            id: [''],
+            invoiceCustomerId: [null],
             shortName: ['', [Validators.required]],
             accountCode: ['', [Validators.required]],
             name: ['', [Validators.required]],
-            addressOne: ['', Validators.required],
-            addressTwo: [''],
-            addressThree: [''],
-            addressFour: [''],
-            addressFive: [''],
+            address1: ['', Validators.required],
+            address2: [''],
+            address3: [''],
+            address4: [''],
+            address5: [''],
             contactName: ['', Validators.required],
-            postcode: ['', Validators.required],
-            contactPhone: ['', [Validators.required]],
-            phone: ['', Validators.required],
+            postCode: ['', Validators.required],
+            contactPhone: [
+                '',
+                [
+                    Validators.required,
+                    Validators.minLength(11),
+                    Validators.maxLength(14),
+                    Validators.pattern(this.phonePattern),
+                ],
+            ],
+            phone: [
+                '',
+                [
+                    Validators.required,
+                    Validators.minLength(11),
+                    Validators.maxLength(14),
+                    Validators.pattern(this.phonePattern),
+                ],
+            ],
             sendInvoiceByEmail: [false, Validators.required],
-            invoiceEmail: ['', [Validators.required]],
+            invoiceEmail: ['', [Validators.required, Validators.email]],
         });
 
-        this.customerSubject.next([
-            {
-                id: 1,
-                accountCode: 'ABC-123',
-                shortName: 'Customer Short Name',
-                name: 'Test Customer',
-                addressOne: 'Address Line 1',
-                addressTwo: 'Address Line 2',
-                addressThree: 'Address Line 3',
-                addressFour: 'Address Line 4',
-                addressFive: 'Address Line 5',
-                postcode: 'Customer Post Code',
-                phone: '+923310247880',
-                sendInvoiceByEmail: true,
-                invoiceEmail: 'test@nybble.co.uk',
-                contactName: 'Test Contact',
-                contactPhone: 'Test Contact Phone',
-            },
-        ]);
+        this.loadFilteredCustomers(this.pageNumber, this.pageSize);
+    }
 
-        this.customer$ = this.customerSubject.asObservable();
+    loadFilteredCustomers(pageNumber: number, pageSize: number) {
+        this.isLoading = true;
+
+        this._sharedService
+            .listFiltered(
+                'invoice/customer',
+                pageNumber,
+                pageSize,
+                this.filterPayload
+            )
+            .pipe(
+                takeUntil(this._unsubscribeAll),
+                finalize(() => {
+                    this.isLoading = false;
+                    this._changeDetectorRef.markForCheck();
+                })
+            )
+            .subscribe(
+                (res: CustomerListContent) => {
+                    this.customers = res.content;
+                    this.totalElements = res.totalElements;
+                },
+                (err) => {
+                    this.customers = [];
+                    this.totalElements = 0;
+                }
+            );
     }
 
     setPageFilter(ev) {
-        this.isLoading = true;
-        setTimeout(() => {
-            this.isLoading = false;
-            this._changeDetectorRef.markForCheck();
-        }, 2000);
-        console.log('Ev', ev);
+        this.pageSize = ev.pageSize;
+        this.loadFilteredCustomers(ev.pageIndex + 1, ev.pageSize);
     }
 
-    trackByFn(index: number, item: Branch): any {
+    applyFilter(
+        accountCode: string,
+        name: string,
+        invoiceEmail: string,
+        contactName: string
+    ) {
+        this.paginator.firstPage();
+
+        this.filterPayload = {
+            accountCode: accountCode === '' ? null : accountCode,
+            invoiceEmail: invoiceEmail === '' ? null : invoiceEmail,
+            contactName: contactName === '' ? null : contactName,
+            name: name === '' ? null : name,
+        };
+        this.loadFilteredCustomers(this.pageNumber, this.pageSize);
+    }
+
+    trackByFn(index: number, item: any): any {
         return item.id || index;
     }
 
@@ -137,9 +197,13 @@ export class CustomerComponent implements OnInit {
     }
 
     cleanUp() {
+        this.isLoading = false;
         this.isDialogOpen = false;
         this.isEditMode = false;
         this.showButtonSpinner = false;
+        this.showSuccessAlert = false;
+        this.showErrorAlert = false;
+        this.responseMessage = '';
     }
 
     addOrEdit(id: number) {
@@ -148,32 +212,98 @@ export class CustomerComponent implements OnInit {
         }
 
         this.showButtonSpinner = true;
-        setTimeout(() => {
-            if (!this.isEditMode) {
-                this.customerForm.value.id = this.idField++;
-                this.customerSubject.next([
-                    ...this.customerSubject.value,
-                    this.customerForm.value,
-                ]);
-            } else {
-                this.customerSubject.value[id - 1] = this.customerForm.value;
-            }
 
-            this.customerForm.reset();
-            this.cleanUp();
-            this._changeDetectorRef.markForCheck();
-        }, 2000);
+        let req;
+        let resposneMsg;
+        if (!id) {
+            req = this._sharedService.post(
+                'invoice/customer',
+                'create',
+                this.customerForm.value
+            );
+            resposneMsg = 'Customer Created Successfuly';
+        } else {
+            req = this._sharedService.put(
+                'invoice/customer',
+                `update/${id}`,
+                this.customerForm.value
+            );
+            resposneMsg = 'Customer Updated Successfuly';
+        }
+
+        req.pipe(
+            takeUntil(this._unsubscribeAll),
+            finalize(() => {
+                this.showButtonSpinner = false;
+                this._changeDetectorRef.markForCheck();
+            })
+        ).subscribe(
+            (_) => {
+                this.showSuccessAlert = false;
+                this.showErrorAlert = false;
+                this.isDialogOpen = false;
+                this._dialog
+                    .open(FeedbackDialogComponent, {
+                        width: '400px',
+                        height: '310px',
+                        data: {
+                            title: 'Success',
+                            message: resposneMsg,
+                            type: 'success',
+                        },
+                    })
+                    .afterClosed()
+                    .subscribe((_) => {
+                        this.paginator.firstPage();
+                        this.loadFilteredCustomers(
+                            this.pageNumber,
+                            this.pageSize
+                        );
+                    });
+            },
+            (err) => {
+                this.showSuccessAlert = false;
+                this.showErrorAlert = true;
+                this.responseMessage =
+                    err.error?.message || 'Unexpected Error Occurred';
+            }
+        );
     }
 
-    edit(id: number) {
+    edit(customer: CustomerList) {
+        this.isLoading = true;
         this.isEditMode = true;
-        const customer: Customer = this.customerSubject.value[id - 1];
 
-        this.customerForm.patchValue(customer);
-        this.openDialog();
+        this._sharedService
+            .get('invoice/customer', `get/${customer.invoiceCustomerId}`)
+            .pipe(
+                takeUntil(this._unsubscribeAll),
+                finalize(() => {
+                    this.isLoading = false;
+                    this._changeDetectorRef.markForCheck();
+                })
+            )
+            .subscribe(
+                (res: CustomerList) => {
+                    this.customerForm.patchValue(res);
+                    this.openDialog();
+                },
+                (_) => {
+                    this._dialog.open(FeedbackDialogComponent, {
+                        width: '400px',
+                        height: '310px',
+                        data: {
+                            title: 'Success',
+                            message: 'Unable To Fetch Customer Data',
+                            type: 'error',
+                        },
+                    });
+                }
+            );
     }
 
     closeAlert() {
-        this.showAlert = false;
+        this.showErrorAlert = false;
+        this.showSuccessAlert = false;
     }
 }

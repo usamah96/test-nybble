@@ -13,6 +13,7 @@ export class UserService {
             id: value.userResponse.userId,
             name: value.userResponse.fullName,
             email: value.userResponse.email,
+            userType: value.userResponse.userTypeOrdinal,
             roles: value.roles,
         });
     }

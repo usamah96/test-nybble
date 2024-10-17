@@ -1,57 +1,93 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
+import { BehaviorSubject, catchError, Observable, of, tap } from 'rxjs';
 import { BranchSummary } from '../types/shared.types';
 import { CustomerSummary } from './../types/shared.types';
 
 @Injectable({ providedIn: 'root' })
 export class SharedService {
-    private branchSummary: BehaviorSubject<BranchSummary[] | null> =
+    baseUrl: string = 'http://invoiceportal.nybble.co.uk:9500/api/';
+    headers: any = {
+        'Content-Type': 'application/json',
+    };
+
+    private branchSummary: BehaviorSubject<BranchSummary[] | []> =
         new BehaviorSubject([]);
 
     private customerSummary: BehaviorSubject<CustomerSummary[] | null> =
         new BehaviorSubject([]);
 
-    private defaultBranches: BranchSummary[] = [
-        {
-            id: 1,
-            code: 'ABC-123',
-        },
-        {
-            id: 2,
-            code: 'ABC-124',
-        },
-        {
-            id: 3,
-            code: 'DEF-456',
-        },
-    ];
+    private _httpClient = inject(HttpClient);
 
-    private defaultCustomers: CustomerSummary[] = [
-        {
-            id: 1,
-            name: 'Customer 1',
-        },
-        {
-            id: 2,
-            name: 'Customer 2',
-        },
-        {
-            id: 3,
-            name: 'Customer 3',
-        },
-    ];
+    listFiltered(
+        module: string,
+        pageNumber: number,
+        pageSize: number,
+        data
+    ): Observable<any> {
+        return this._httpClient.post(
+            `${this.baseUrl}${module}/list/filtered/${pageNumber}/${pageSize}`,
+            data,
+            { headers: this.headers }
+        );
+    }
 
-    get branchSummary$(): Observable<BranchSummary[]> {
-        if (this.branchSummary.value.length == 0) {
-            this.branchSummary.next(this.defaultBranches);
-        }
+    post(module: string, path: string, data): Observable<any> {
+        return this._httpClient.post(`${this.baseUrl}${module}/${path}`, data, {
+            headers: this.headers,
+        });
+    }
+
+    put(module: string, path: string, data): Observable<any> {
+        return this._httpClient.put(`${this.baseUrl}${module}/${path}`, data, {
+            headers: this.headers,
+        });
+    }
+
+    patch(module: string, path: string): Observable<any> {
+        return this._httpClient.patch(`${this.baseUrl}${module}/${path}`, {
+            headers: this.headers,
+        });
+    }
+
+    get(module: string, path: string): Observable<any> {
+        return this._httpClient.get(`${this.baseUrl}${module}/${path}`, {
+            headers: this.headers,
+        });
+    }
+
+    nameSummary(module: string): Observable<any> {
+        return this._httpClient
+            .get(`${this.baseUrl}${module}/name-summary`, {
+                headers: this.headers,
+            })
+            .pipe(
+                tap((res: any[]) => {
+                    if (module === 'branch') {
+                        this.branchNameSummary = res;
+                    } else if (module === 'invoice/customer') {
+                        this.customerNameSummary = res;
+                    }
+                }),
+                catchError(() => {
+                    return of([]);
+                })
+            );
+    }
+
+    set branchNameSummary(res: BranchSummary[]) {
+        this.branchSummary.next(res);
+    }
+
+    set customerNameSummary(res: CustomerSummary[]) {
+        this.customerSummary.next(res);
+    }
+
+    get branchNameSummary(): Observable<BranchSummary[]> {
         return this.branchSummary.asObservable();
     }
 
-    get customerSummary$(): Observable<CustomerSummary[]> {
-        if (this.customerSummary.value.length == 0) {
-            this.customerSummary.next(this.defaultCustomers);
-        }
+    get customerNameSummary(): Observable<CustomerSummary[]> {
         return this.customerSummary.asObservable();
     }
 }

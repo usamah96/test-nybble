@@ -2,6 +2,7 @@ export interface LoginUser {
     id: number;
     email: string;
     name: string;
+    userType: number;
     roles: [Role];
 }
 
@@ -27,25 +28,62 @@ export interface User {
     invoiceCustomers?: number[];
 }
 
-export interface Branch {
-    id: number;
+export interface UserListContent {
+    content: UserList[];
+    totalElements: number;
+    totalPages: number;
+}
+
+export interface BranchListContent {
+    content: BranchList[];
+    totalElements: number;
+    totalPages: number;
+}
+
+export interface CustomerListContent {
+    content: CustomerList[];
+    totalElements: number;
+    totalPages: number;
+}
+
+export interface UserList {
+    userId: number;
+    fullName: string;
+    email: string;
+    isLocked: boolean;
+    phone: string;
+    password: string;
+    confirmPassword: string;
+    userType: string;
+    userTypeOrdinal: number;
+    branchIds: [];
+    invoiceCustomerIds: [];
+    sendInvoiceByEmail: boolean;
+    invoiceEmail: string;
+}
+
+export interface BranchList {
+    branchId: number;
     code: string;
     shortName: string;
     name: string;
-    addressOne: string;
-    addressTwo: string;
-    addressThree: string;
+    address1: string;
+    address2: string;
+    address3: string;
     town: string;
     phone: string;
     county: string;
     country: string;
-    postcode: string;
+    postCode: string;
     fax: string;
+    email: string;
+    status: string;
+    emailBody: string;
 }
 
 export interface BranchSummary {
-    id: number;
-    code: string;
+    branchId: number;
+    name: string;
 }
 
 export interface BranchStatusType {
@@ -53,18 +91,18 @@ export interface BranchStatusType {
     name: string;
 }
 
-export interface Customer {
-    id: number;
+export interface CustomerList {
+    invoiceCustomerId: number;
     accountCode: string;
     shortName: string;
     name: string;
-    addressOne: string;
-    addressTwo: string;
-    addressThree: string;
-    addressFour: string;
-    addressFive: string;
+    address1: string;
+    address2: string;
+    address3: string;
+    address4: string;
+    address5: string;
     phone: string;
-    postcode: string;
+    postCode: string;
     sendInvoiceByEmail: boolean;
     invoiceEmail: string;
     contactName: string;
@@ -74,4 +112,17 @@ export interface Customer {
 export interface CustomerSummary {
     id: number;
     name: string;
+}
+
+export interface DashboardResponse {
+    totalBranches?: number;
+    totalInvoiceCustomers?: number;
+    totalUsers?: number;
+    allInvoices?: number;
+    outstandingInvoices?: number;
+    queriedInvoices?: number;
+    paidInvoices?: number;
+    messageSent?: number;
+    messageReceived?: number;
+    totalCustomers?: number;
 }

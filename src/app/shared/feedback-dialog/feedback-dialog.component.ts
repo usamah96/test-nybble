@@ -8,21 +8,21 @@ import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { fuseAnimations } from '@fuse/animations';
 
 @Component({
-    selector: 'dialog',
-    templateUrl: './dialog.component.html',
+    selector: 'feedback-dialog',
+    templateUrl: './feedback-dialog.component.html',
     encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.OnPush,
     animations: fuseAnimations,
     standalone: true,
     imports: [MatDialogModule],
 })
-export class DialogComponent {
+export class FeedbackDialogComponent {
     constructor(
         @Inject(MAT_DIALOG_DATA)
         public data: {
             title: string;
-            content: string;
-            actions: { success: string; cancel: string };
+            message: string;
+            type: string;
         }
     ) {}
 }
